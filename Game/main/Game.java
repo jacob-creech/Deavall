@@ -1,34 +1,32 @@
-package com.devour.all.main;
+package main;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.devour.all.handlers.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.devour.all.handlers.GameStateManager;
+import handlers.GameStateManager;
+import handlers.PlayerInputProcessor;
 
 public class Game extends ApplicationAdapter {
 
-	public static final String TITLE = "Deavall";
-    private SpriteBatch sb;
+    public static final String TITLE = "Deavall";
+    private static SpriteBatch sb;
     private OrthographicCamera mainCamera;
     private OrthographicCamera hudCamera;
 
     public static final float STEP = 1/60f;
     private float accum;
 
-    public SpriteBatch getSpriteBatch() { return sb; }
+    public static SpriteBatch getSpriteBatch() { return sb; }
     public OrthographicCamera getMainCamera() { return mainCamera; }
     public OrthographicCamera getHudCamera() { return hudCamera; }
 
     private GameStateManager gsm;
 
-	@Override
-	public void create() {
+    @Override
+    public void create() {
 
-        Gdx.input.setInputProcessor(new InputProcessor().returnGestureDetector());
+        Gdx.input.setInputProcessor(new PlayerInputProcessor());
 
         sb = new SpriteBatch();
         mainCamera = new OrthographicCamera();
@@ -38,10 +36,10 @@ public class Game extends ApplicationAdapter {
 
         gsm = new GameStateManager(this);
 
-	}
+    }
 
-	@Override
-	public void render() {
+    @Override
+    public void render() {
 
         accum += Gdx.graphics.getDeltaTime();
         while(accum >= STEP){
@@ -51,7 +49,7 @@ public class Game extends ApplicationAdapter {
 
         }
 
-	}
+    }
 
     public void dispose() {
         sb.dispose();

@@ -1,8 +1,8 @@
-package com.devour.all.handlers;
+package handlers;
 
-import com.devour.all.main.Game;
-import com.devour.all.states.GameState;
-import com.devour.all.states.Play;
+import main.Game;
+import states.GameState;
+import states.Play;
 
 import java.util.Stack;
 

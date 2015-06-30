@@ -1,4 +1,4 @@
-package com.devour.all.handlers;
+package handlers;
 
 /**
  * Created by Jacob on 6/28/2015.

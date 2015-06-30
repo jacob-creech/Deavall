@@ -1,10 +1,10 @@
-package com.devour.all.handlers;
+package handlers;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.devour.all.Entities.Enemy;
-import com.devour.all.Entities.Entity;
-import com.devour.all.Entities.Player;
+import entities.Enemy;
+import entities.Entity;
+import entities.Player;
 
 /**
  * Created by Jacob on 6/28/2015.

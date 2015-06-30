@@ -1,17 +1,12 @@
-package com.devour.all.states;
+package states;
 
 import com.badlogic.gdx.Gdx;
-
-import static com.devour.all.handlers.Box2DVars.BIT_BARRIER;
-import static com.devour.all.handlers.Box2DVars.BIT_ENEMY;
-import static com.devour.all.handlers.Box2DVars.BIT_FOOD;
-import static com.devour.all.handlers.Box2DVars.BIT_PLAYER;
-import static com.devour.all.handlers.Box2DVars.BIT_VIRUS;
-import static com.devour.all.handlers.Box2DVars.PPM;
+import static handlers.Box2DVars.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -20,15 +15,15 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.devour.all.Entities.Enemy;
-import com.devour.all.Entities.Food;
-import com.devour.all.Entities.Player;
-import com.devour.all.handlers.EntityContactListener;
-import com.devour.all.handlers.EventHandler;
-import com.devour.all.handlers.GameStateManager;
-import com.devour.all.handlers.InputHandler;
-
 import java.util.ArrayList;
+
+import entities.Enemy;
+import entities.Food;
+import entities.Player;
+import handlers.Background;
+import handlers.EntityContactListener;
+import handlers.EventHandler;
+import handlers.GameStateManager;
 
 /**
  * Created by Jacob on 6/28/2015.
@@ -48,6 +43,7 @@ public class Play extends GameState {
     public static Player getPlayer() { return player; }
 
     private OrthographicCamera b2dcam;
+    private Background background;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -67,6 +63,11 @@ public class Play extends GameState {
         // Create the Player
         createPlayer();
 
+        // Create Background
+        Texture texture = new Texture(Gdx.files.internal("grid.png"));
+        TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
+        background = new Background(textureRegion, mainCamera, .31f);
+
     }
 
     public void createArea(){
@@ -82,7 +83,7 @@ public class Play extends GameState {
         // Top Left corner
         createBarrier(WIDTH*(-2), HEIGHT * (2), true);
         // Bottom Right corner
-        createBarrier(WIDTH*(-2), HEIGHT * (-2), false);
+        createBarrier(WIDTH*(2), HEIGHT * (-2), false);
 
 
     }
@@ -124,7 +125,7 @@ public class Play extends GameState {
         * area.
          */
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(WIDTH / 4 / PPM, HEIGHT / 2 / PPM);
+        bodyDef.position.set(WIDTH / 4 / PPM - 2.5f / PPM, HEIGHT / 2 / PPM - 2.5f / PPM);
         bodyDef.type = BodyType.DynamicBody;
         Body body = world.createBody(bodyDef);
 
@@ -159,7 +160,27 @@ public class Play extends GameState {
         // Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        sb.begin();
+
+        sb.setProjectionMatrix(hudCamera.combined);
+        background.render();
+
+        sb.setProjectionMatrix(mainCamera.combined);
+        mainCamera.position.set(
+                player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
+                player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
+                0
+        );
+        mainCamera.update();
+        sb.end();
+
         // Draw box2d world
+        b2dcam.position.set(
+                player.getBody().getPosition().x ,//+ WIDTH / 8 / PPM ,
+                player.getBody().getPosition().y,
+                0
+        );
+        b2dcam.update();
         b2dr.render(world, b2dcam.combined);
 
     }
