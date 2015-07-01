@@ -1,11 +1,12 @@
-package main;
+package com.devour.all.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import handlers.GameStateManager;
-import handlers.PlayerInputProcessor;
+import com.devour.all.handlers.GameStateManager;
+import com.devour.all.handlers.PlayerInputProcessor;
+
 
 public class Game extends ApplicationAdapter {
 

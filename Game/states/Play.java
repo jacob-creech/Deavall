@@ -1,7 +1,7 @@
-package states;
+package com.devour.all.states;
 
 import com.badlogic.gdx.Gdx;
-import static handlers.Box2DVars.*;
+import static com.devour.all.handlers.Box2DVars.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,15 +15,17 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import java.util.ArrayList;
+import com.devour.all.entities.Enemy;
+import com.devour.all.entities.Food;
+import com.devour.all.entities.Player;
+import com.devour.all.handlers.Background;
+import com.devour.all.handlers.EntityContactListener;
+import com.devour.all.handlers.EventHandler;
+import com.devour.all.handlers.GameStateManager;
 
-import entities.Enemy;
-import entities.Food;
-import entities.Player;
-import handlers.Background;
-import handlers.EntityContactListener;
-import handlers.EventHandler;
-import handlers.GameStateManager;
+import java.util.ArrayList;
+import java.util.Random;
+
 
 /**
  * Created by Jacob on 6/28/2015.
@@ -36,7 +38,7 @@ public class Play extends GameState {
     private final float HEIGHT = Gdx.graphics.getHeight();
 
     private ArrayList<Enemy> enemies;
-    private ArrayList<Food> food;
+    private ArrayList<Food> foods;
     private static Player player;
     private EventHandler eventHandler;
 
@@ -57,14 +59,23 @@ public class Play extends GameState {
         b2dcam = new OrthographicCamera();
         b2dcam.setToOrtho(false, (WIDTH/2) / PPM, (WIDTH/2) / PPM);
 
+        // Initialize arrayLists
+        enemies = new ArrayList<Enemy>();
+        foods = new ArrayList<Food>();
+
         // Create the area for the entities
         createArea();
 
         // Create the Player
         createPlayer();
 
+        // Create food
+        for(int i = 0; i < 50; i++){
+            createFood();
+        }
+
         // Create Background
-        Texture texture = new Texture(Gdx.files.internal("grid.png"));
+        Texture texture = new Texture(Gdx.files.internal("android/assets/grid.png"));
         TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
         background = new Background(textureRegion, mainCamera, .31f);
 
@@ -125,12 +136,12 @@ public class Play extends GameState {
         * area.
          */
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(WIDTH / 4 / PPM - 2.5f / PPM, HEIGHT / 2 / PPM - 2.5f / PPM);
+        bodyDef.position.set(WIDTH / 4 / PPM - 10 / PPM, HEIGHT / 2 / PPM - 10 / PPM);
         bodyDef.type = BodyType.DynamicBody;
         Body body = world.createBody(bodyDef);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(5 / PPM);
+        circle.setRadius(10 / PPM);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.filter.categoryBits = BIT_PLAYER;
@@ -141,6 +152,34 @@ public class Play extends GameState {
         body.setUserData(player);
 
         circle.dispose();
+    }
+
+    public void createFood(){
+        BodyDef bodyDef = new BodyDef();
+        Random rand = new Random();
+        int maxX = (int) (4*WIDTH);
+        int maxY = (int) (4*HEIGHT);
+        int randomX = rand.nextInt(maxX+1);
+        int randomY = rand.nextInt(maxY+1);
+
+        // Creating random coordinates between barriers
+        randomX -= (int) (2*WIDTH);
+        randomY -= (int) (2*HEIGHT);
+
+        bodyDef.position.set(randomX / PPM, randomY / PPM);
+        bodyDef.type = BodyType.StaticBody;
+        Body body = world.createBody(bodyDef);
+        CircleShape circle = new CircleShape();
+        circle.setRadius(5 / PPM);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.filter.categoryBits = BIT_FOOD;
+        fixtureDef.filter.maskBits = BIT_ENEMY | BIT_PLAYER;
+        body.createFixture(fixtureDef).setUserData(BIT_FOOD);
+
+        Food food = new Food(body);
+        circle.dispose();
+        foods.add(food);
     }
 
     @Override

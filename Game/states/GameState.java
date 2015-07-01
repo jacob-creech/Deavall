@@ -1,10 +1,9 @@
-package states;
+package com.devour.all.states;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-import handlers.GameStateManager;
-import main.Game;
+import com.devour.all.handlers.GameStateManager;
+import com.devour.all.main.Game;
 
 
 /**

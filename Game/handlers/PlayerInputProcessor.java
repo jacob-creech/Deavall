@@ -1,10 +1,10 @@
-package handlers;
+package com.devour.all.handlers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import states.Play;
+import com.devour.all.states.Play;
 
 /**
  * Created by Jacob on 6/29/2015.

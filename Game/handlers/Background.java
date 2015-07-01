@@ -1,4 +1,4 @@
-package handlers;
+package com.devour.all.handlers;
 
 /**
  * Created by Jacob on 6/29/2015.
@@ -6,8 +6,7 @@ package handlers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
-import main.Game;
+import com.devour.all.main.Game;
 
 /**
  * With much help from the BlockBunny tutorial

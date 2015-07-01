@@ -1,4 +1,4 @@
-package entities;
+package com.devour.all.entities;
 
 import com.badlogic.gdx.physics.box2d.Body;
 

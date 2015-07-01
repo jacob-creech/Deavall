@@ -1,8 +1,8 @@
-package handlers;
+package com.devour.all.handlers;
 
-import main.Game;
-import states.GameState;
-import states.Play;
+import com.devour.all.main.Game;
+import com.devour.all.states.GameState;
+import com.devour.all.states.Play;
 
 import java.util.Stack;
 
@@ -24,9 +24,7 @@ public class GameStateManager {
 
     public Game game() { return game; }
 
-    public void create(){
-
-    }
+    public void create(){}
 
     public void update(float dt){
         gameStates.peek().update(dt);
