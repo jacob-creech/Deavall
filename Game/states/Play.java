@@ -32,13 +32,13 @@ import java.util.Random;
  */
 public class Play extends GameState {
 
-    private World world;
+    private static World world;
     private Box2DDebugRenderer b2dr;
-    private final float WIDTH = Gdx.graphics.getWidth();
-    private final float HEIGHT = Gdx.graphics.getHeight();
+    private static final float WIDTH = Gdx.graphics.getWidth();
+    private static final float HEIGHT = Gdx.graphics.getHeight();
 
     private ArrayList<Enemy> enemies;
-    private ArrayList<Food> foods;
+    private static ArrayList<Food> foods;
     private static Player player;
     private EventHandler eventHandler;
 
@@ -70,7 +70,7 @@ public class Play extends GameState {
         createPlayer();
 
         // Create food
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < 100; i++){
             createFood();
         }
 
@@ -154,7 +154,7 @@ public class Play extends GameState {
         circle.dispose();
     }
 
-    public void createFood(){
+    public static void createFood(){
         BodyDef bodyDef = new BodyDef();
         Random rand = new Random();
         int maxX = (int) (4*WIDTH);
@@ -178,6 +178,7 @@ public class Play extends GameState {
         body.createFixture(fixtureDef).setUserData(BIT_FOOD);
 
         Food food = new Food(body);
+        body.setUserData(food);
         circle.dispose();
         foods.add(food);
     }
@@ -190,6 +191,16 @@ public class Play extends GameState {
         //System.out.println(player.getBody().getPosition().x + " " + player.getBody().getPosition().y);
         handleInput();
         world.step(dt, 6, 2);
+
+        ArrayList<Body> bodies = eventHandler.getBodies();
+        for(int i = 0; i < bodies.size(); i++) {
+            System.out.println("Removing Food");
+            Body b = bodies.get(i);
+            foods.remove(b.getUserData());
+            world.destroyBody(bodies.get(i));
+            Play.createFood();
+        }
+        bodies.clear();
 
     }
 

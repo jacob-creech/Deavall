@@ -11,6 +11,8 @@ public class Enemy extends Entity {
         super(body);
     }
 
+
+
     @Override
     public void barrierCollision() {
 

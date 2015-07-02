@@ -9,9 +9,8 @@ public class Player extends Entity{
 
     public Player(Body body) {
         super(body);
+        this.setSize(.1f);
     }
-
-    public Body getBody(){ return body; }
 
     @Override
     public void barrierCollision() {
