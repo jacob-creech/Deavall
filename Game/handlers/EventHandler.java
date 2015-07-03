@@ -27,7 +27,9 @@ public class EventHandler {
     }
 
     public boolean getWin() { return win; }
+    public void setWin(Boolean b) { win = b; }
     public boolean getGameOver() { return gameover; }
+    public void setGameover(Boolean b) { gameover = b; }
 
     public void handleBarrierCol(Fixture fixtureA, Fixture fixtureB) {
         if(fixtureA.getBody().getUserData().equals("Barrier")){

@@ -1,6 +1,9 @@
 package com.devour.all.states;
 
 import com.badlogic.gdx.Gdx;
+
+import static com.badlogic.gdx.math.MathUtils.random;
+import static com.badlogic.gdx.math.MathUtils.randomSign;
 import static com.devour.all.handlers.Box2DVars.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -68,6 +71,11 @@ public class Play extends GameState {
 
         // Create the Player
         createPlayer();
+
+        // Create enemies
+        for(int i = 0; i < 8; i++){
+            createEnemy();
+        }
 
         // Create food
         for(int i = 0; i < 100; i++){
@@ -154,7 +162,55 @@ public class Play extends GameState {
         circle.dispose();
     }
 
+    public void createEnemy(){
+        /*
+        * This function randomly generates enemies within the
+        * play area with varying sizes.
+         */
+        BodyDef bodyDef = new BodyDef();
+        Random rand = new Random();
+        int maxX = (int) (4*WIDTH);
+        int maxY = (int) (4*HEIGHT);
+        int randomX = rand.nextInt(maxX+1);
+        int randomY = rand.nextInt(maxY+1);
+
+        // Creating random coordinates between barriers
+        randomX -= (int) (2*WIDTH);
+        randomY -= (int) (2*HEIGHT);
+
+        bodyDef.position.set(randomX / PPM, randomY / PPM);
+        bodyDef.type = BodyType.DynamicBody;
+        Body body = world.createBody(bodyDef);
+        CircleShape circle = new CircleShape();
+
+        /*
+        * In order to create both a challenge and possibility to
+        * improve, enemies are generated at 0 - 25% larger and
+        * smaller than the current player.
+         */
+        float percentageDiff = random(0,25) / 100;
+        float radius = player.getSize() + randomSign() * player.getSize() * percentageDiff;
+        circle.setRadius(radius / PPM);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.filter.categoryBits = BIT_ENEMY;
+        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_PLAYER | BIT_FOOD | BIT_VIRUS;
+
+
+        body.createFixture(fixtureDef).setUserData(BIT_ENEMY);
+
+        Enemy enemy = new Enemy(body);
+        body.setUserData(enemy);
+        circle.dispose();
+        enemies.add(enemy);
+    }
+
+
     public static void createFood(){
+        /*
+        * This function randomly creates food within the
+        * play area.
+         */
         BodyDef bodyDef = new BodyDef();
         Random rand = new Random();
         int maxX = (int) (4*WIDTH);
@@ -194,7 +250,6 @@ public class Play extends GameState {
 
         ArrayList<Body> bodies = eventHandler.getBodies();
         for(int i = 0; i < bodies.size(); i++) {
-            System.out.println("Removing Food");
             Body b = bodies.get(i);
             foods.remove(b.getUserData());
             world.destroyBody(bodies.get(i));
