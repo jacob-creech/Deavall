@@ -24,11 +24,12 @@ public class EntityContactListener implements ContactListener {
         /*
         * Called whenever two box2dbodies collide with each other
         * Reference for the box2dBits:
-        *   Barrier = 000010
-        *   Player  = 000100
-        *   Enemy   = 001000
-        *   Food    = 010000
-        *   Virus   = 100000
+        *   Barrier     = 0000010
+        *   Player      = 0000100
+        *   Enemy       = 0001000
+        *   Food        = 0010000
+        *   Virus       = 0100000
+        *   EnemyFilter = 1000000
         */
 
         Fixture fixtureA = contact.getFixtureA();
@@ -72,6 +73,9 @@ public class EntityContactListener implements ContactListener {
         }
         else if(contact.equals("32")){
             bitMap = 0x20;
+        }
+        else if(contact.equals("64")){
+            bitMap = 0x40;
         }
 
         return bitMap;
@@ -120,6 +124,22 @@ public class EntityContactListener implements ContactListener {
         if((bitMap & 0x28) == 0x28){
             // TODO: ENEMY CONTACTS VIRUS
             eventHandler.handleVirusCol(fixtureA, fixtureB);
+        }
+        if((bitMap & 0x44) == 0x44){
+            // ENEMY FILTER CONTACTS PLAYER
+            eventHandler.handleAIPlayer(fixtureA, fixtureB);
+        }
+        if((bitMap & 0x48) == 0x48){
+            // ENEMY FILTER CONTACTS ENEMY
+            eventHandler.handleAIEnemy(fixtureA, fixtureB);
+        }
+        if((bitMap & 0x50) == 0x50){
+            // ENEMY FILTER CONTACTS FOOD
+            eventHandler.handleAIFood(fixtureA, fixtureB);
+        }
+        if((bitMap & 0x60) == 0x60){
+            // ENEMY FILTER CONTACTS VIRUS
+            eventHandler.handleAIVirus(fixtureA, fixtureB);
         }
 
     }

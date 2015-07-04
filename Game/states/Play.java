@@ -73,14 +73,14 @@ public class Play extends GameState {
         createPlayer();
 
         // Create enemies
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 100; i++){
             createEnemy();
         }
 
         // Create food
-        for(int i = 0; i < 100; i++){
+        /*for(int i = 0; i < 100; i++){
             createFood();
-        }
+        }*/
 
         // Create Background
         Texture texture = new Texture(Gdx.files.internal("android/assets/grid.png"));
@@ -152,8 +152,9 @@ public class Play extends GameState {
         circle.setRadius(10 / PPM);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
+        fixtureDef.isSensor = false;
         fixtureDef.filter.categoryBits = BIT_PLAYER;
-        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_ENEMY | BIT_FOOD | BIT_VIRUS;
+        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_ENEMY | BIT_FOOD | BIT_VIRUS | BIT_ENEMY_FILTER;
         body.createFixture(fixtureDef).setUserData(BIT_PLAYER);
 
         player = new Player(body);
@@ -179,25 +180,41 @@ public class Play extends GameState {
         randomY -= (int) (2*HEIGHT);
 
         bodyDef.position.set(randomX / PPM, randomY / PPM);
-        bodyDef.type = BodyType.DynamicBody;
+        bodyDef.type = BodyType.StaticBody;
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
 
         /*
         * In order to create both a challenge and possibility to
-        * improve, enemies are generated at 0 - 25% larger and
+        * improve, enemies are generated at 0 - 50% larger and
         * smaller than the current player.
+        * There is also a rare chance of a very large percentage
+        * difference between a player and an enemy. We are
+        * setting this percentage to .5% for now.
          */
-        float percentageDiff = random(0,25) / 100;
+        float percentageDiff = random(0,50) / 100f;
+
+        int randomNum = rand.nextInt( (200-0) + 1);
+        if(randomNum == 1) {
+            percentageDiff = random(125,175) / 100f;
+        }
+
         float radius = player.getSize() + randomSign() * player.getSize() * percentageDiff;
-        circle.setRadius(radius / PPM);
+        circle.setRadius(radius);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
+        fixtureDef.isSensor = false;
         fixtureDef.filter.categoryBits = BIT_ENEMY;
-        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_PLAYER | BIT_FOOD | BIT_VIRUS;
-
-
+        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_PLAYER | BIT_FOOD | BIT_VIRUS | BIT_ENEMY_FILTER;
         body.createFixture(fixtureDef).setUserData(BIT_ENEMY);
+
+        // Creating a filter for AI decisions
+        circle.setRadius(radius * 2.5f);
+        fixtureDef.shape = circle;
+        fixtureDef.isSensor = true;
+        fixtureDef.filter.categoryBits = BIT_ENEMY_FILTER;
+        fixtureDef.filter.maskBits = BIT_PLAYER | BIT_FOOD | BIT_VIRUS | BIT_ENEMY;
+        body.createFixture(fixtureDef).setUserData(BIT_ENEMY_FILTER);
 
         Enemy enemy = new Enemy(body);
         body.setUserData(enemy);
@@ -229,8 +246,9 @@ public class Play extends GameState {
         circle.setRadius(5 / PPM);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
+        fixtureDef.isSensor = false;
         fixtureDef.filter.categoryBits = BIT_FOOD;
-        fixtureDef.filter.maskBits = BIT_ENEMY | BIT_PLAYER;
+        fixtureDef.filter.maskBits = BIT_ENEMY | BIT_PLAYER | BIT_ENEMY_FILTER;
         body.createFixture(fixtureDef).setUserData(BIT_FOOD);
 
         Food food = new Food(body);

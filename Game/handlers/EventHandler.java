@@ -1,5 +1,6 @@
 package com.devour.all.handlers;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.devour.all.entities.Enemy;
@@ -9,6 +10,8 @@ import com.devour.all.entities.Player;
 import com.devour.all.states.Play;
 
 import java.util.ArrayList;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 /**
  * Created by Jacob on 6/28/2015.
@@ -73,6 +76,65 @@ public class EventHandler {
     }
 
     public void handleVirusCol(Fixture fixtureA, Fixture fixtureB) {}
+
+    public void handleAIPlayer(Fixture fixtureA, Fixture fixtureB){
+        Enemy enemy = returnEnemy(fixtureA,fixtureB);
+        Player player = Play.getPlayer();
+
+        float enemyX = enemy.getBody().getPosition().x;
+        float enemyY = enemy.getBody().getPosition().y;
+        float playerX = player.getBody().getPosition().x;
+        float playerY = player.getBody().getPosition().y;
+
+        float randomPercentage = random(0,100) / 100f;
+
+        if(player.getSize() > enemy.getSize() && randomPercentage > .8){
+            // Avoid player
+            enemy.setGather(false);
+            enemy.setFlight(true);
+            Vector2 direction = new Vector2(playerX - enemyX, playerY - enemyY);
+            enemy.getBody().setLinearVelocity(direction.scl(enemy.getSpeed()));
+        }
+        else{
+            // Do nothing, carry on
+        }
+    }
+
+    public void handleAIEnemy(Fixture fixtureA, Fixture fixtureB){
+
+    }
+
+    public void handleAIFood(Fixture fixtureA, Fixture fixtureB){
+        Enemy enemy = returnEnemy(fixtureA,fixtureB);
+        Food food = returnFood(fixtureA,fixtureB);
+        Body enemyBody = enemy.getBody();
+
+        float enemyX = enemy.getBody().getPosition().x;
+        float enemyY = enemy.getBody().getPosition().y;
+        float foodX = food.getBody().getPosition().x;
+        float foodY = food.getBody().getPosition().y;
+        // Make sure that enemy is set to gather
+        if(enemy.getGather()){
+            Vector2 direction = new Vector2(foodX - enemyX, foodY - enemyY);
+            enemyBody.setLinearVelocity(direction.scl(enemy.getSpeed()));
+        }
+    }
+
+    public void handleAIVirus(Fixture fixtureA, Fixture fixtureB){}
+
+    public Enemy returnEnemy(Fixture fixtureA, Fixture fixtureB){
+        if(fixtureA.getBody().getUserData() instanceof Enemy){
+            return (Enemy)fixtureA.getBody().getUserData();
+        }
+        return (Enemy)fixtureB.getBody().getUserData();
+    }
+
+    public Food returnFood(Fixture fixtureA, Fixture fixtureB){
+        if(fixtureA.getBody().getUserData() instanceof Enemy){
+            return (Food)fixtureA.getBody().getUserData();
+        }
+        return (Food)fixtureB.getBody().getUserData();
+    }
 
     public void resizePlayer(Player player){
         float size = player.getSize();

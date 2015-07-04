@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 public abstract class Entity {
     protected Body body;
     private float size;
+    private float speed;
 
     public Entity(Body body){
         this.body = body;
@@ -17,6 +18,13 @@ public abstract class Entity {
     public Body getBody(){ return body; }
     public float getSize() { return size; }
     public void setSize(float size) { this.size = size; }
+
+    public float getSpeed(){
+        float speed;
+        speed = size * 20f;
+        return speed;
+    }
+
 
     public void resize(Body body, float newRadius){
         Shape shape = body.getFixtureList().get(0).getShape();

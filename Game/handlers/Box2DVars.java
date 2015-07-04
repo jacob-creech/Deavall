@@ -14,5 +14,6 @@ public class Box2DVars {
     public static final short BIT_ENEMY = 8;
     public static final short BIT_FOOD = 16;
     public static final short BIT_VIRUS = 32;
+    public static final short BIT_ENEMY_FILTER = 64;
 
 }
