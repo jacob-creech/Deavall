@@ -88,14 +88,17 @@ public class EventHandler {
 
         float randomPercentage = random(0,100) / 100f;
 
-        if(player.getSize() > enemy.getSize() && randomPercentage > .8){
+        if(/*player.getSize() > enemy.getSize() &&*/ randomPercentage < 1f){
             // Avoid player
+            System.out.println("Avoiding Player");
             enemy.setGather(false);
             enemy.setFlight(true);
-            Vector2 direction = new Vector2(playerX - enemyX, playerY - enemyY);
+            Vector2 direction = new Vector2(-(playerX - enemyX), -(playerY - enemyY));
+            direction.nor();
             enemy.getBody().setLinearVelocity(direction.scl(enemy.getSpeed()));
         }
         else{
+            enemy.setGather(true);
             // Do nothing, carry on
         }
     }
@@ -130,7 +133,7 @@ public class EventHandler {
     }
 
     public Food returnFood(Fixture fixtureA, Fixture fixtureB){
-        if(fixtureA.getBody().getUserData() instanceof Enemy){
+        if(fixtureA.getBody().getUserData() instanceof Food){
             return (Food)fixtureA.getBody().getUserData();
         }
         return (Food)fixtureB.getBody().getUserData();

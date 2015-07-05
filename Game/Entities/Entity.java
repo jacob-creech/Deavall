@@ -1,6 +1,7 @@
 package com.devour.all.entities;
 
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 /**
@@ -9,7 +10,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 public abstract class Entity {
     protected Body body;
     private float size;
-    private float speed;
 
     public Entity(Body body){
         this.body = body;
@@ -21,15 +21,23 @@ public abstract class Entity {
 
     public float getSpeed(){
         float speed;
-        speed = size * 20f;
+        speed = (2f-size);
         return speed;
     }
 
 
     public void resize(Body body, float newRadius){
-        Shape shape = body.getFixtureList().get(0).getShape();
-        System.out.println("Radius : " + shape.getRadius());
-        shape.setRadius(newRadius);
+        Shape shape;
+        for(int i = 0; i < body.getFixtureList().size; i++){
+            shape = body.getFixtureList().get(i).getShape();
+            if(body.getFixtureList().get(i).isSensor()){
+                shape.setRadius(.15f + newRadius);
+            }
+            else{
+                shape.setRadius(newRadius);
+            }
+        }
+
     }
     public abstract void barrierCollision();
 

@@ -15,6 +15,7 @@ public class Enemy extends Entity {
         super(body);
         gather = true;
         flight = false;
+        this.setSize(body.getFixtureList().get(0).getShape().getRadius());
 
     }
 

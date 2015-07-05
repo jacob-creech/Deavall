@@ -49,8 +49,8 @@ public class PlayerInputProcessor implements InputProcessor {
         direction.sub(body.getPosition());
         direction.nor();
 
-        float speed = 2;
-        body.setLinearVelocity(direction.scl(speed));
+        float speed = Play.getPlayer().getSpeed();
+        body.setLinearVelocity(direction.scl(2f));
         return false;
     }
 

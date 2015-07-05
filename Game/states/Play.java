@@ -73,14 +73,14 @@ public class Play extends GameState {
         createPlayer();
 
         // Create enemies
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 50; i++){
             createEnemy();
         }
 
         // Create food
-        /*for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 100; i++){
             createFood();
-        }*/
+        }
 
         // Create Background
         Texture texture = new Texture(Gdx.files.internal("android/assets/grid.png"));
@@ -155,6 +155,7 @@ public class Play extends GameState {
         fixtureDef.isSensor = false;
         fixtureDef.filter.categoryBits = BIT_PLAYER;
         fixtureDef.filter.maskBits = BIT_BARRIER | BIT_ENEMY | BIT_FOOD | BIT_VIRUS | BIT_ENEMY_FILTER;
+        body.setLinearDamping(1f);
         body.createFixture(fixtureDef).setUserData(BIT_PLAYER);
 
         player = new Player(body);
@@ -180,7 +181,7 @@ public class Play extends GameState {
         randomY -= (int) (2*HEIGHT);
 
         bodyDef.position.set(randomX / PPM, randomY / PPM);
-        bodyDef.type = BodyType.StaticBody;
+        bodyDef.type = BodyType.DynamicBody;
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
 
@@ -205,11 +206,11 @@ public class Play extends GameState {
         fixtureDef.shape = circle;
         fixtureDef.isSensor = false;
         fixtureDef.filter.categoryBits = BIT_ENEMY;
-        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_PLAYER | BIT_FOOD | BIT_VIRUS | BIT_ENEMY_FILTER;
+        fixtureDef.filter.maskBits = BIT_BARRIER | BIT_PLAYER | BIT_FOOD | BIT_VIRUS | BIT_ENEMY_FILTER | BIT_ENEMY;
         body.createFixture(fixtureDef).setUserData(BIT_ENEMY);
 
         // Creating a filter for AI decisions
-        circle.setRadius(radius * 2.5f);
+        circle.setRadius(radius + .15f);
         fixtureDef.shape = circle;
         fixtureDef.isSensor = true;
         fixtureDef.filter.categoryBits = BIT_ENEMY_FILTER;
