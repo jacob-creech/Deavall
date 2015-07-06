@@ -4,11 +4,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.devour.all.entities.Enemy;
-import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
 import com.devour.all.entities.Player;
 import com.devour.all.states.Play;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -51,16 +54,20 @@ public class EventHandler {
         * whether or not the player or enemy can eat one
         * another on contact.
          */
-
+        System.out.println("Food Collision");
         if(fixtureA.getBody().getUserData() instanceof Enemy){
-            resizeEnemy((Enemy)fixtureA.getBody().getUserData());
+            Enemy enemy = (Enemy)fixtureA.getBody().getUserData();
+            resizeEnemy(enemy);
+            followNextPath(enemy);
         }
         else if(fixtureA.getBody().getUserData() instanceof Player){
             Player player = Play.getPlayer();
             resizePlayer(player);
         }
         else if(fixtureB.getBody().getUserData() instanceof Enemy){
-            resizeEnemy((Enemy)fixtureA.getBody().getUserData());
+            Enemy enemy = (Enemy)fixtureB.getBody().getUserData();
+            resizeEnemy(enemy);
+            followNextPath(enemy);
         }
         else if(fixtureB.getBody().getUserData() instanceof Player){
             Player player = Play.getPlayer();
@@ -73,6 +80,11 @@ public class EventHandler {
         else if(fixtureB.getBody().getUserData() instanceof Food){
             addToRemove(fixtureB.getBody());
         }
+    }
+
+    public void followNextPath(Enemy enemy){
+        System.out.println("Following next path");
+        enemy.followPath();
     }
 
     public void handleVirusCol(Fixture fixtureA, Fixture fixtureB) {}
@@ -88,7 +100,7 @@ public class EventHandler {
 
         float randomPercentage = random(0,100) / 100f;
 
-        if(/*player.getSize() > enemy.getSize() &&*/ randomPercentage < 1f){
+        if(player.getSize() > enemy.getSize() && randomPercentage < .8f){
             // Avoid player
             System.out.println("Avoiding Player");
             enemy.setGather(false);
@@ -119,6 +131,7 @@ public class EventHandler {
         // Make sure that enemy is set to gather
         if(enemy.getGather()){
             Vector2 direction = new Vector2(foodX - enemyX, foodY - enemyY);
+            direction.nor();
             enemyBody.setLinearVelocity(direction.scl(enemy.getSpeed()));
         }
     }

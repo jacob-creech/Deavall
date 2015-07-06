@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.devour.all.entities.Enemy;
+import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
 import com.devour.all.entities.Player;
 import com.devour.all.handlers.Background;
@@ -26,6 +27,11 @@ import com.devour.all.handlers.EntityContactListener;
 import com.devour.all.handlers.EventHandler;
 import com.devour.all.handlers.GameStateManager;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,12 +46,15 @@ public class Play extends GameState {
     private static final float WIDTH = Gdx.graphics.getWidth();
     private static final float HEIGHT = Gdx.graphics.getHeight();
 
-    private ArrayList<Enemy> enemies;
+    private static ArrayList<Enemy> enemies;
     private static ArrayList<Food> foods;
     private static Player player;
     private EventHandler eventHandler;
 
+    public static SimpleWeightedGraph entityGraph;
+
     public static Player getPlayer() { return player; }
+    public static ArrayList<Food> getFoods() { return foods; }
 
     private OrthographicCamera b2dcam;
     private Background background;
@@ -65,6 +74,7 @@ public class Play extends GameState {
         // Initialize arrayLists
         enemies = new ArrayList<Enemy>();
         foods = new ArrayList<Food>();
+        entityGraph = new SimpleWeightedGraph<Body, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         // Create the area for the entities
         createArea();
@@ -72,14 +82,14 @@ public class Play extends GameState {
         // Create the Player
         createPlayer();
 
-        // Create enemies
-        for(int i = 0; i < 50; i++){
-            createEnemy();
+        // Create food
+        for(int i = 0; i < 500; i++){
+            createFood();
         }
 
-        // Create food
-        for(int i = 0; i < 100; i++){
-            createFood();
+        // Create enemies
+        for(int i = 0; i < 8; i++){
+            createEnemy();
         }
 
         // Create Background
@@ -220,6 +230,10 @@ public class Play extends GameState {
         Enemy enemy = new Enemy(body);
         body.setUserData(enemy);
         circle.dispose();
+
+        entityGraph.addVertex(body);
+        addBodyToGraph(body);
+        enemy.findShortestPath();
         enemies.add(enemy);
     }
 
@@ -255,26 +269,70 @@ public class Play extends GameState {
         Food food = new Food(body);
         body.setUserData(food);
         circle.dispose();
+
+        entityGraph.addVertex(body);
         foods.add(food);
+        addBodyToGraph(body);
+    }
+
+    public static void addBodyToGraph(Body body){
+        /*
+        * This function creates a graph of all the entities.
+        * This graph will be used for pathfinding with enemies.
+        * Each food is only connected to 2 other food entities,
+        * the 2 entities being the shortest distance away upon
+        * creation of the original entity.
+         */
+        DefaultWeightedEdge minEdge = new DefaultWeightedEdge();
+        Body minBody = foods.get(0).getBody();
+        DefaultWeightedEdge edge;
+        double currentWeight = 100;
+        for(int i = 0; i < foods.size(); i++){
+            //edge = (DefaultWeightedEdge)entityGraph.addEdge(foods.get(i).getBody(), body);
+            double weight;
+            double xDiff = foods.get(i).getBody().getPosition().x - body.getPosition().x;
+            double yDiff = foods.get(i).getBody().getPosition().y - body.getPosition().y;
+            weight = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+            minBody = foods.get(i).getBody();
+            if(minBody != body) {
+                minEdge = (DefaultWeightedEdge) entityGraph.addEdge(minBody, body);
+                entityGraph.setEdgeWeight(minEdge, currentWeight);
+            }
+            if(weight < currentWeight){
+                currentWeight = weight;
+            }
+        }
+        /*if(minBody != body) {
+            minEdge = (DefaultWeightedEdge) entityGraph.addEdge(minBody, body);
+            entityGraph.setEdgeWeight(minEdge, currentWeight);
+        }*/
     }
 
     @Override
     public void handleInput() {  }
 
+    int enemyCounter = 0;
+    Vector2 zeroSpeed = new Vector2(1,1);
     @Override
     public void update(float dt) {
-        //System.out.println(player.getBody().getPosition().x + " " + player.getBody().getPosition().y);
         handleInput();
         world.step(dt, 6, 2);
 
         ArrayList<Body> bodies = eventHandler.getBodies();
         for(int i = 0; i < bodies.size(); i++) {
             Body b = bodies.get(i);
+            entityGraph.removeVertex(b);
             foods.remove(b.getUserData());
             world.destroyBody(bodies.get(i));
             Play.createFood();
         }
         bodies.clear();
+
+        for(int i = 0; i < enemies.size(); i++){
+            if(enemies.get(i).getBody().getLinearVelocity().isZero()){
+                enemies.get(i).followPath();
+            }
+        }
 
     }
 
