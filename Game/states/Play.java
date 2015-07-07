@@ -46,7 +46,7 @@ public class Play extends GameState {
     private static final float WIDTH = Gdx.graphics.getWidth();
     private static final float HEIGHT = Gdx.graphics.getHeight();
 
-    private static ArrayList<Enemy> enemies;
+    public static ArrayList<Enemy> enemies;
     private static ArrayList<Food> foods;
     private static Player player;
     private EventHandler eventHandler;
@@ -58,6 +58,7 @@ public class Play extends GameState {
 
     private OrthographicCamera b2dcam;
     private Background background;
+    Texture backgroundTexture;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -83,19 +84,21 @@ public class Play extends GameState {
         createPlayer();
 
         // Create food
-        for(int i = 0; i < 500; i++){
+        System.out.println("Creating Food");
+        for(int i = 0; i < 50; i++){
             createFood();
         }
-
+        System.out.println("Done Creating Food");
         // Create enemies
         for(int i = 0; i < 8; i++){
             createEnemy();
         }
-
+        System.out.println("Done Creating Enemies");
         // Create Background
-        Texture texture = new Texture(Gdx.files.internal("android/assets/grid.png"));
-        TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
-        background = new Background(textureRegion, mainCamera, .31f);
+        backgroundTexture = new Texture(Gdx.files.internal("grid.png"));
+        backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        //TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
+        //background = new Background(textureRegion, mainCamera, 1f);
 
     }
 
@@ -311,18 +314,26 @@ public class Play extends GameState {
     @Override
     public void handleInput() {  }
 
-    int enemyCounter = 0;
-    Vector2 zeroSpeed = new Vector2(1,1);
+    int playerY;
+    int playerX;
     @Override
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
 
+        playerX = (int)(player.getBody().getPosition().x * PPM * 2) % 98;
+        playerY = (int)(player.getBody().getPosition().y * PPM * 1.5) % 98;
+
         ArrayList<Body> bodies = eventHandler.getBodies();
         for(int i = 0; i < bodies.size(); i++) {
             Body b = bodies.get(i);
             entityGraph.removeVertex(b);
-            foods.remove(b.getUserData());
+            if(b.getUserData() instanceof Food) {
+                foods.remove(b.getUserData());
+            }
+            else if(b.getUserData() instanceof Enemy){
+                enemies.remove(b.getUserData());
+            }
             world.destroyBody(bodies.get(i));
             Play.createFood();
         }
@@ -345,7 +356,10 @@ public class Play extends GameState {
         sb.begin();
 
         sb.setProjectionMatrix(hudCamera.combined);
-        background.render();
+        //background.render();
+
+
+        sb.draw(backgroundTexture, 0,0,playerX,-playerY,(int)WIDTH,(int)HEIGHT);
 
         sb.setProjectionMatrix(mainCamera.combined);
         mainCamera.position.set(

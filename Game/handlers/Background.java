@@ -58,7 +58,6 @@ public class Background {
         float x = ((this.x + camera.viewportWidth / 2 - camera.position.x) * scale) % image.getRegionWidth();
         float y = ((this.y + camera.viewportHeight / 2 - camera.position.y) * scale) % image.getRegionHeight();
 
-
         int colOffset = x > 0 ? -1 : 0;
         int rowOffset = y > 0 ? -1 : 0;
         for(int row = 0; row <= numDrawY; row++) {

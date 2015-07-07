@@ -62,7 +62,7 @@ public class EntityContactListener implements ContactListener {
         }
         else if(contact.equals("8")){
             if(fixtureCheck){
-                bitMap = 0x48;
+                bitMap = 0x8;
             }
             else{
                 bitMap = 0x8;
@@ -86,7 +86,7 @@ public class EntityContactListener implements ContactListener {
         * This function checks for an event and sends any and all events
         * to the event handler.
          */
-        if(bitMap == 0x0){
+        if(bitMap == 0x8){
             // TODO: ENEMY CONTACTED ENEMY
             eventHandler.handleEnemyCol(fixtureA, fixtureB);
         }

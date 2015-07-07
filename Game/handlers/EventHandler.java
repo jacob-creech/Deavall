@@ -46,7 +46,25 @@ public class EventHandler {
         }
     }
     public void handlePlayerEnemyCol(Fixture player, Fixture enemy) {}
-    public void handleEnemyCol(Fixture enemyA, Fixture enemyB) {}
+    public void handleEnemyCol(Fixture fixtureA, Fixture fixtureB) {
+        Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
+        Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
+        if(enemyA.getSize() > (enemyB.getSize()*1.25f)){
+            System.out.println(enemyA.getSize());
+            enemyA.resize(enemyA.getBody(), enemyA.getSize() + (enemyB.getSize()*.1f));
+            enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.1f));
+            System.out.println(enemyA.getSize());
+            addToRemove(enemyB.getBody());
+        }
+        else if(enemyB.getSize() > (enemyA.getSize()*1.25f)){
+            System.out.println(enemyB.getSize());
+            enemyB.resize(enemyB.getBody(), enemyB.getSize() + (enemyA.getSize()*.1f));
+            enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.1f));
+            System.out.println(enemyB.getSize());
+            addToRemove(enemyA.getBody());
+        }
+
+    }
     public void handleFoodCol(Fixture fixtureA, Fixture fixtureB) {
         /*
         * This method properly resizes a body whenever it
@@ -54,7 +72,6 @@ public class EventHandler {
         * whether or not the player or enemy can eat one
         * another on contact.
          */
-        System.out.println("Food Collision");
         if(fixtureA.getBody().getUserData() instanceof Enemy){
             Enemy enemy = (Enemy)fixtureA.getBody().getUserData();
             resizeEnemy(enemy);
@@ -83,7 +100,6 @@ public class EventHandler {
     }
 
     public void followNextPath(Enemy enemy){
-        System.out.println("Following next path");
         enemy.followPath();
     }
 
@@ -116,6 +132,9 @@ public class EventHandler {
     }
 
     public void handleAIEnemy(Fixture fixtureA, Fixture fixtureB){
+        Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
+        Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
+
 
     }
 
