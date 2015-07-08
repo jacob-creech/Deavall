@@ -40,13 +40,28 @@ public class EventHandler {
     public void handleBarrierCol(Fixture fixtureA, Fixture fixtureB) {
         if(fixtureA.getBody().getUserData().equals("Barrier")){
             changeAnimation(fixtureB.getBody());
+            if(fixtureB.getBody().getUserData() instanceof Enemy){
+                Enemy enemy = (Enemy)fixtureB.getBody().getUserData();
+                enemy.barrierCollision();
+            }
         }
         else{
             changeAnimation(fixtureA.getBody());
+            if(fixtureA.getBody().getUserData() instanceof Enemy){
+                Enemy enemy = (Enemy)fixtureA.getBody().getUserData();
+                enemy.barrierCollision();
+            }
         }
     }
     public void handlePlayerEnemyCol(Fixture player, Fixture enemy) {}
     public void handleEnemyCol(Fixture fixtureA, Fixture fixtureB) {
+        /*
+        * This method properly handles whenever an enemy body
+        * comes in contact with another enemy body. The proper
+        * procedure is to check whether or not one of the bodies
+        * is 25% bigger than the other, then remove the smaller
+        * and increase the size of the larger.
+         */
         Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
         Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
         if(enemyA.getSize() > (enemyB.getSize()*1.25f)){
@@ -55,6 +70,7 @@ public class EventHandler {
             enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.1f));
             System.out.println(enemyA.getSize());
             addToRemove(enemyB.getBody());
+            followNextPath(enemyA);
         }
         else if(enemyB.getSize() > (enemyA.getSize()*1.25f)){
             System.out.println(enemyB.getSize());
@@ -62,6 +78,11 @@ public class EventHandler {
             enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.1f));
             System.out.println(enemyB.getSize());
             addToRemove(enemyA.getBody());
+            followNextPath(enemyB);
+        }
+        else{
+            followNextPath(enemyA);
+            followNextPath(enemyB);
         }
 
     }
@@ -135,7 +156,37 @@ public class EventHandler {
         Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
         Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
 
+        float enemyAX = enemyA.getBody().getPosition().x;
+        float enemyAY = enemyA.getBody().getPosition().y;
+        float enemyBX = enemyB.getBody().getPosition().x;
+        float enemyBY = enemyB.getBody().getPosition().y;
 
+        float randomPercentageA = random(0,100) / 100f;
+        float randomPercentageB = random(0,100) / 100f;
+
+        if(enemyB.getSize() > enemyA.getSize() && randomPercentageA < .6f){
+            enemyA.setGather(false);
+            enemyA.setFlight(true);
+            Vector2 direction = new Vector2(-(enemyBX - enemyAX), -(enemyBY - enemyAY));
+            direction.nor();
+            enemyA.getBody().setLinearVelocity(direction.scl(enemyA.getSpeed()));
+        }
+        else if(enemyA.getSize() > enemyB.getSize() && randomPercentageB < .6f){
+            enemyB.setGather(false);
+            enemyB.setFlight(true);
+            Vector2 direction = new Vector2(-(enemyAX - enemyBX), -(enemyAY - enemyBY));
+            direction.nor();
+            enemyB.getBody().setLinearVelocity(direction.scl(enemyB.getSpeed()));
+        }
+        else{
+            Vector2 directionA = new Vector2(-(enemyBX - enemyAX), -(enemyBY - enemyAY));
+            directionA.nor();
+            enemyB.getBody().setLinearVelocity(directionA.scl(enemyB.getSpeed()));
+
+            Vector2 directionB = new Vector2(-(enemyAX - enemyBX), -(enemyAY - enemyBY));
+            directionB.nor();
+            enemyA.getBody().setLinearVelocity(directionB.scl(enemyA.getSpeed()));
+        }
     }
 
     public void handleAIFood(Fixture fixtureA, Fixture fixtureB){

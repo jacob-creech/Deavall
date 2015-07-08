@@ -85,7 +85,7 @@ public class Play extends GameState {
 
         // Create food
         System.out.println("Creating Food");
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < 500; i++){
             createFood();
         }
         System.out.println("Done Creating Food");
@@ -95,7 +95,7 @@ public class Play extends GameState {
         }
         System.out.println("Done Creating Enemies");
         // Create Background
-        backgroundTexture = new Texture(Gdx.files.internal("grid.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("android/assets/grid.png"));
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         //TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
         //background = new Background(textureRegion, mainCamera, 1f);
