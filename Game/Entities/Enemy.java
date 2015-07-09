@@ -38,7 +38,6 @@ public class Enemy extends Entity {
     public boolean getFlight() { return flight; }
     public void setFlight(boolean b) { flight = b; }
     public List getPath() { return pathToGo; }
-    public int getIndex() { return index; }
 
     public void findShortestPath(){
         if(pathToGo == null) {

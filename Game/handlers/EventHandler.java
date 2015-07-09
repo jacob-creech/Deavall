@@ -22,18 +22,14 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class EventHandler {
 
     private boolean gameover;
-    private boolean win;
     private ArrayList<Body> bodiesToRemove;
 
     public EventHandler(){
         super();
         gameover = false;
-        win = false;
         bodiesToRemove = new ArrayList<Body>();
     }
 
-    public boolean getWin() { return win; }
-    public void setWin(Boolean b) { win = b; }
     public boolean getGameOver() { return gameover; }
     public void setGameover(Boolean b) { gameover = b; }
 
@@ -53,7 +49,26 @@ public class EventHandler {
             }
         }
     }
-    public void handlePlayerEnemyCol(Fixture player, Fixture enemy) {}
+    public void handlePlayerEnemyCol(Fixture fixtureA, Fixture fixtureB) {
+        /*
+        * This method properly handles whenever a player body
+        * comes into contact with an enemy body. If the enemy
+        * body is 25% less than the player, the enemy is removed.
+        * Else, if the player is 25% less, the game ends and the
+        * gameover switch is set to true.
+         */
+        Player player = Play.getPlayer();
+        Enemy enemy = returnEnemy(fixtureA, fixtureB);
+
+        if(enemy.getSize() > (player.getSize()*1.25f)){
+            setGameover(true);
+        }
+        else if(player.getSize() > (enemy.getSize()*1.25f)){
+            player.resize(player.getBody(), player.getSize() + (enemy.getSize() * .3f));
+            player.setSize(player.getSize() + (enemy.getSize() * .3f));
+            addToRemove(enemy.getBody());
+        }
+    }
     public void handleEnemyCol(Fixture fixtureA, Fixture fixtureB) {
         /*
         * This method properly handles whenever an enemy body
@@ -65,18 +80,14 @@ public class EventHandler {
         Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
         Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
         if(enemyA.getSize() > (enemyB.getSize()*1.25f)){
-            System.out.println(enemyA.getSize());
-            enemyA.resize(enemyA.getBody(), enemyA.getSize() + (enemyB.getSize()*.1f));
-            enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.1f));
-            System.out.println(enemyA.getSize());
+            enemyA.resize(enemyA.getBody(), enemyA.getSize() + (enemyB.getSize()*.3f));
+            enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.3f));
             addToRemove(enemyB.getBody());
             followNextPath(enemyA);
         }
         else if(enemyB.getSize() > (enemyA.getSize()*1.25f)){
-            System.out.println(enemyB.getSize());
-            enemyB.resize(enemyB.getBody(), enemyB.getSize() + (enemyA.getSize()*.1f));
-            enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.1f));
-            System.out.println(enemyB.getSize());
+            enemyB.resize(enemyB.getBody(), enemyB.getSize() + (enemyA.getSize()*.3f));
+            enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.3f));
             addToRemove(enemyA.getBody());
             followNextPath(enemyB);
         }

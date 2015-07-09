@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.devour.all.entities.Enemy;
 import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
+import com.devour.all.entities.HUD;
 import com.devour.all.entities.Player;
 import com.devour.all.handlers.Background;
 import com.devour.all.handlers.EntityContactListener;
@@ -58,7 +59,8 @@ public class Play extends GameState {
 
     private OrthographicCamera b2dcam;
     private Background background;
-    Texture backgroundTexture;
+    private Texture backgroundTexture;
+    private HUD hud;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -82,6 +84,7 @@ public class Play extends GameState {
 
         // Create the Player
         createPlayer();
+        hud = new HUD(player);
 
         // Create food
         System.out.println("Creating Food");
@@ -345,6 +348,10 @@ public class Play extends GameState {
             }
         }
 
+        if(eventHandler.getGameOver()){
+            // Gameover screen
+        }
+
     }
 
     @Override
@@ -356,10 +363,8 @@ public class Play extends GameState {
         sb.begin();
 
         sb.setProjectionMatrix(hudCamera.combined);
-        //background.render();
-
-
         sb.draw(backgroundTexture, 0,0,playerX,-playerY,(int)WIDTH,(int)HEIGHT);
+        hud.render();
 
         sb.setProjectionMatrix(mainCamera.combined);
         mainCamera.position.set(
