@@ -34,6 +34,8 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 
@@ -56,6 +58,7 @@ public class Play extends GameState {
 
     public static Player getPlayer() { return player; }
     public static ArrayList<Food> getFoods() { return foods; }
+    private LinkedList<Body> bodiesToShrink;
 
     private OrthographicCamera b2dcam;
     private Background background;
@@ -77,6 +80,7 @@ public class Play extends GameState {
         // Initialize arrayLists
         enemies = new ArrayList<Enemy>();
         foods = new ArrayList<Food>();
+        bodiesToShrink = new LinkedList<Body>();
         entityGraph = new SimpleWeightedGraph<Body, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         // Create the area for the entities
@@ -176,6 +180,7 @@ public class Play extends GameState {
 
         player = new Player(body);
         body.setUserData(player);
+        //bodiesToShrink.addLast(body);
 
         circle.dispose();
     }
@@ -241,6 +246,7 @@ public class Play extends GameState {
         addBodyToGraph(body);
         enemy.findShortestPath();
         enemies.add(enemy);
+        //bodiesToShrink.addLast(body);
     }
 
 
@@ -314,11 +320,31 @@ public class Play extends GameState {
         }*/
     }
 
+    public void shrinkBody(){
+        Body body = bodiesToShrink.remove();
+        System.out.println(body.getUserData().getClass().getName());
+        if(body.getUserData() instanceof Enemy){
+            Enemy enemy = (Enemy)body.getUserData();
+            System.out.println("Shrinking Enemy");
+            enemy.shrink(body);
+        }
+        if(body.getUserData() instanceof Player){
+            Player player = (Player)body.getUserData();
+            System.out.println("Shrinking Player");
+            player.shrink(body);
+        }
+
+        bodiesToShrink.add(body);
+
+    }
+
+
     @Override
     public void handleInput() {  }
 
     int playerY;
     int playerX;
+    int shrinkTimer = 0;
     @Override
     public void update(float dt) {
         handleInput();
@@ -336,6 +362,7 @@ public class Play extends GameState {
             }
             else if(b.getUserData() instanceof Enemy){
                 enemies.remove(b.getUserData());
+                //bodiesToShrink.remove(b);
             }
             world.destroyBody(bodies.get(i));
             Play.createFood();
@@ -347,6 +374,16 @@ public class Play extends GameState {
                 enemies.get(i).followPath();
             }
         }
+
+        /*
+        * Every 3 seconds, you lose 1% of your mass. This
+        * Balances the game and creates a bit more of a
+        * struggle instead of continuously increasing.
+         */
+        if(shrinkTimer % 30 == 0){
+            //shrinkBody();
+        }
+        shrinkTimer++;
 
         if(eventHandler.getGameOver()){
             // Gameover screen

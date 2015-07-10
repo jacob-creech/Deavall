@@ -19,7 +19,7 @@ public class HUD extends ApplicationAdapter{
     }
 
     public void render(){
-        String score = player.getScore();
+        String score = player.getScoreString();
         font.draw(Game.getSpriteBatch(), score, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 20);
     }
     public void dispose(){ font.dispose(); }

@@ -20,10 +20,6 @@ public class Player extends Entity{
 
     }
 
-    public String getScore(){
-        score = (int)Math.ceil(this.getSize() * 100f);
-        return Integer.toString(score);
-    }
 
 
     @Override

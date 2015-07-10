@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 public abstract class Entity {
     protected Body body;
     private float size;
+    int score;
 
     public Entity(Body body){
         this.body = body;
@@ -25,7 +26,6 @@ public abstract class Entity {
         return speed;
     }
 
-
     public void resize(Body body, float newRadius){
         Shape shape;
         for(int i = 0; i < body.getFixtureList().size; i++){
@@ -37,8 +37,23 @@ public abstract class Entity {
                 shape.setRadius(newRadius);
             }
         }
-
     }
+
+    public String getScoreString(){
+        score = (int)Math.ceil(this.getSize() * 1000f - 99);
+        return Integer.toString(score);
+    }
+
+    public int getScoreInt(){
+        score = (int)Math.ceil(this.getSize() * 1000f - 99);
+        return score;
+    }
+
+    public void shrink(Body body){
+        System.out.println(this.getSize()*.99f);
+        resize(body, this.getSize()*.99f);
+    }
+
     public abstract void barrierCollision();
 
     public abstract void update(float dt);

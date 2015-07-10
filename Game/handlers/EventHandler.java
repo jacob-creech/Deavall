@@ -236,14 +236,18 @@ public class EventHandler {
     public void resizePlayer(Player player){
         float size = player.getSize();
         Body body = player.getBody();
-        player.setSize((float)(size + (size * .01)));
-        player.resize(body, (float)(size + (size * .01)));
+        int factor = (int)(Math.log(player.getScoreInt())/Math.log(100));
+        float newSizeInc = (float)(.001 / Math.pow(10, factor));
+        player.setSize(size + (newSizeInc));
+        player.resize(body, size + (newSizeInc));
     }
     public void resizeEnemy(Enemy enemy){
         float size = enemy.getSize();
         Body body = enemy.getBody();
-        enemy.setSize((float)(size + (size * .01)));
-        enemy.resize(body, (float)(size + (size * .01)));
+        int factor = (int)(Math.log(enemy.getScoreInt())/Math.log(100));
+        float newSizeInc = (float)(.001 / Math.pow(10, factor));
+        enemy.setSize(size + newSizeInc);
+        enemy.resize(body, size + newSizeInc);
     }
 
     public void addToRemove(Body body){ bodiesToRemove.add(body); }
