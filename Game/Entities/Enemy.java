@@ -9,7 +9,10 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -22,6 +25,7 @@ public class Enemy extends Entity {
     private boolean flight;
     private List pathToGo;
     private int index;
+    private HashMap<Double, Body> bodies;
 
     public Enemy(Body body) {
 
@@ -29,6 +33,8 @@ public class Enemy extends Entity {
         gather = true;
         flight = false;
         this.setSize(body.getFixtureList().get(0).getShape().getRadius());
+        bodies = new HashMap<Double, Body>();
+        pathToGo = new ArrayList<Float>();
         index = 0;
 
     }
@@ -37,37 +43,35 @@ public class Enemy extends Entity {
     public void setGather(boolean b) { gather = b; }
     public boolean getFlight() { return flight; }
     public void setFlight(boolean b) { flight = b; }
-    public List getPath() { return pathToGo; }
 
-    public void findShortestPath(){
-        if(pathToGo == null) {
-            Play.entityGraph.removeVertex(body);
-            Play.entityGraph.addVertex(body);
-            Play.addBodyToGraph(body);
+    public void populateMap(){
+        for(int i = 0; i < Play.getFoods().size(); i++){
+            double distance;
+            Body foodBody = Play.getFoods().get(i).getBody();
+            distance = Math.sqrt(Math.pow((double)body.getPosition().x - foodBody.getPosition().x, 2)
+                            + Math.pow(body.getPosition().y - foodBody.getPosition().y, 2));
+            bodies.put(distance, Play.getFoods().get(i).getBody());
         }
-        ArrayList<Food> foods = Play.getFoods();
-        int randomIndex = random(0, foods.size()-1);
-        Body foodBody = foods.get(randomIndex).getBody();
-        pathToGo = DijkstraShortestPath.findPathBetween(Play.entityGraph, this.body, foodBody);
-        index = 0;
-        followPath();
     }
 
-    public void followPath(){
-        if(pathToGo == null){
-            findShortestPath();
-            System.out.println("NULL");
+    public void sortMap(){
+        Set<Double> keys = bodies.keySet();
+        pathToGo.addAll(keys);
+        Collections.sort(pathToGo);
+    }
+
+    public void findNextPath(){
+        if(pathToGo.isEmpty()){
+            populateMap();
+            sortMap();
         }
-        else if(pathToGo.size() > index) {
-            DefaultEdge edge = (DefaultWeightedEdge)pathToGo.get(index);
-            Body foodBody = (Body)Play.entityGraph.getEdgeTarget(edge);
-            if(foodBody != null) {
-                goToPoint(foodBody);
-                index++;
-            }
-            else{ findShortestPath(); }
+        if(index == bodies.size()){
+            index = index % bodies.size();
         }
-        else{findShortestPath();}
+        Body foodBody = bodies.get(pathToGo.get(index));
+        index++;
+        System.out.println(index + " " + body);
+        goToPoint(foodBody);
 
     }
 
@@ -85,7 +89,7 @@ public class Enemy extends Entity {
 
     @Override
     public void barrierCollision() {
-        findShortestPath();
+
     }
 
     @Override

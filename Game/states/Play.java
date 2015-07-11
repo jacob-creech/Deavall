@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.devour.all.Algorithm.QuickSort;
 import com.devour.all.entities.Enemy;
 import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
@@ -34,7 +35,9 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
@@ -55,10 +58,10 @@ public class Play extends GameState {
     private EventHandler eventHandler;
 
     public static SimpleWeightedGraph entityGraph;
+    public static QuickSort sorter;
 
     public static Player getPlayer() { return player; }
     public static ArrayList<Food> getFoods() { return foods; }
-    private LinkedList<Body> bodiesToShrink;
 
     private OrthographicCamera b2dcam;
     private Background background;
@@ -80,8 +83,7 @@ public class Play extends GameState {
         // Initialize arrayLists
         enemies = new ArrayList<Enemy>();
         foods = new ArrayList<Food>();
-        bodiesToShrink = new LinkedList<Body>();
-        entityGraph = new SimpleWeightedGraph<Body, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        sorter = new QuickSort();
 
         // Create the area for the entities
         createArea();
@@ -180,7 +182,6 @@ public class Play extends GameState {
 
         player = new Player(body);
         body.setUserData(player);
-        //bodiesToShrink.addLast(body);
 
         circle.dispose();
     }
@@ -242,11 +243,9 @@ public class Play extends GameState {
         body.setUserData(enemy);
         circle.dispose();
 
-        entityGraph.addVertex(body);
-        addBodyToGraph(body);
-        enemy.findShortestPath();
+        enemy.findNextPath();
+
         enemies.add(enemy);
-        //bodiesToShrink.addLast(body);
     }
 
 
@@ -282,60 +281,21 @@ public class Play extends GameState {
         body.setUserData(food);
         circle.dispose();
 
-        entityGraph.addVertex(body);
         foods.add(food);
-        addBodyToGraph(body);
     }
 
-    public static void addBodyToGraph(Body body){
-        /*
-        * This function creates a graph of all the entities.
-        * This graph will be used for pathfinding with enemies.
-        * Each food is only connected to 2 other food entities,
-        * the 2 entities being the shortest distance away upon
-        * creation of the original entity.
-         */
-        DefaultWeightedEdge minEdge = new DefaultWeightedEdge();
-        Body minBody = foods.get(0).getBody();
-        DefaultWeightedEdge edge;
-        double currentWeight = 100;
-        for(int i = 0; i < foods.size(); i++){
-            //edge = (DefaultWeightedEdge)entityGraph.addEdge(foods.get(i).getBody(), body);
-            double weight;
-            double xDiff = foods.get(i).getBody().getPosition().x - body.getPosition().x;
-            double yDiff = foods.get(i).getBody().getPosition().y - body.getPosition().y;
-            weight = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
-            minBody = foods.get(i).getBody();
-            if(minBody != body) {
-                minEdge = (DefaultWeightedEdge) entityGraph.addEdge(minBody, body);
-                entityGraph.setEdgeWeight(minEdge, currentWeight);
-            }
-            if(weight < currentWeight){
-                currentWeight = weight;
-            }
-        }
-        /*if(minBody != body) {
-            minEdge = (DefaultWeightedEdge) entityGraph.addEdge(minBody, body);
-            entityGraph.setEdgeWeight(minEdge, currentWeight);
-        }*/
-    }
-
-    public void shrinkBody(){
-        Body body = bodiesToShrink.remove();
+    public void shrinkBody(Body body){
         System.out.println(body.getUserData().getClass().getName());
         if(body.getUserData() instanceof Enemy){
             Enemy enemy = (Enemy)body.getUserData();
             System.out.println("Shrinking Enemy");
-            enemy.shrink(body);
+            //enemy.shrink(body);
         }
         if(body.getUserData() instanceof Player){
             Player player = (Player)body.getUserData();
             System.out.println("Shrinking Player");
-            player.shrink(body);
+            //player.shrink(body);
         }
-
-        bodiesToShrink.add(body);
-
     }
 
 
@@ -345,6 +305,8 @@ public class Play extends GameState {
     int playerY;
     int playerX;
     int shrinkTimer = 0;
+    int enemyIndex = 0;
+    Body bodyToShrink;
     @Override
     public void update(float dt) {
         handleInput();
@@ -356,13 +318,11 @@ public class Play extends GameState {
         ArrayList<Body> bodies = eventHandler.getBodies();
         for(int i = 0; i < bodies.size(); i++) {
             Body b = bodies.get(i);
-            entityGraph.removeVertex(b);
             if(b.getUserData() instanceof Food) {
                 foods.remove(b.getUserData());
             }
             else if(b.getUserData() instanceof Enemy){
                 enemies.remove(b.getUserData());
-                //bodiesToShrink.remove(b);
             }
             world.destroyBody(bodies.get(i));
             Play.createFood();
@@ -371,7 +331,7 @@ public class Play extends GameState {
 
         for(int i = 0; i < enemies.size(); i++){
             if(enemies.get(i).getBody().getLinearVelocity().isZero()){
-                enemies.get(i).followPath();
+                enemies.get(i).findNextPath();
             }
         }
 
@@ -381,8 +341,14 @@ public class Play extends GameState {
         * struggle instead of continuously increasing.
          */
         if(shrinkTimer % 30 == 0){
-            //shrinkBody();
+            bodyToShrink = enemies.get(enemyIndex % enemies.size()).getBody();
+            //shrinkBody(bodyToShrink);
+            enemyIndex++;
+            if(shrinkTimer % 180 == 0){
+                //shrinkBody(player.getBody());
+            }
         }
+
         shrinkTimer++;
 
         if(eventHandler.getGameOver()){

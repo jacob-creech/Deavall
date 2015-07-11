@@ -51,6 +51,7 @@ public abstract class Entity {
 
     public void shrink(Body body){
         System.out.println(this.getSize()*.99f);
+        setSize(this.getSize()*.99f);
         resize(body, this.getSize()*.99f);
     }
 

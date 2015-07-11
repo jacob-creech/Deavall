@@ -77,6 +77,7 @@ public class EventHandler {
         * is 25% bigger than the other, then remove the smaller
         * and increase the size of the larger.
          */
+        System.out.println("enemy collision");
         Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
         Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
         if(enemyA.getSize() > (enemyB.getSize()*1.25f)){
@@ -104,6 +105,7 @@ public class EventHandler {
         * whether or not the player or enemy can eat one
         * another on contact.
          */
+        System.out.println("food collision");
         if(fixtureA.getBody().getUserData() instanceof Enemy){
             Enemy enemy = (Enemy)fixtureA.getBody().getUserData();
             resizeEnemy(enemy);
@@ -132,7 +134,7 @@ public class EventHandler {
     }
 
     public void followNextPath(Enemy enemy){
-        enemy.followPath();
+        enemy.findNextPath();
     }
 
     public void handleVirusCol(Fixture fixtureA, Fixture fixtureB) {}
