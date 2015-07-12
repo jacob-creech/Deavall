@@ -43,15 +43,25 @@ public class Enemy extends Entity {
     public void setGather(boolean b) { gather = b; }
     public boolean getFlight() { return flight; }
     public void setFlight(boolean b) { flight = b; }
+    public List getPath() { return pathToGo; }
+    public int getIndex() { return index; }
 
     public void populateMap(){
         for(int i = 0; i < Play.getFoods().size(); i++){
             double distance;
             Body foodBody = Play.getFoods().get(i).getBody();
             distance = Math.sqrt(Math.pow((double)body.getPosition().x - foodBody.getPosition().x, 2)
-                            + Math.pow(body.getPosition().y - foodBody.getPosition().y, 2));
+                    + Math.pow(body.getPosition().y - foodBody.getPosition().y, 2));
             bodies.put(distance, Play.getFoods().get(i).getBody());
         }
+    }
+
+    public void addFoodBody(Body foodBody){
+        double distance;
+        distance = Math.sqrt(Math.pow((double)body.getPosition().x - foodBody.getPosition().x, 2)
+                + Math.pow(body.getPosition().y - foodBody.getPosition().y, 2));
+        pathToGo.add(distance);
+        bodies.put(distance, foodBody);
     }
 
     public void sortMap(){
@@ -68,10 +78,19 @@ public class Enemy extends Entity {
         if(index == bodies.size()){
             index = index % bodies.size();
         }
-        Body foodBody = bodies.get(pathToGo.get(index));
+        Body foodBody = bodies.get(pathToGo.get(0));
+        bodies.remove(pathToGo.get(0));
+        pathToGo.remove(0);
         index++;
-        System.out.println(index + " " + body);
-        goToPoint(foodBody);
+        if(index % Play.getFoods().size() == 0){
+            index = index % Play.getFoods().size();
+            index = 0;
+            sortMap();
+        }
+        //System.out.println(index + " " + body);
+        if(foodBody != null){
+            goToPoint(foodBody);
+        }
 
     }
 
@@ -89,7 +108,7 @@ public class Enemy extends Entity {
 
     @Override
     public void barrierCollision() {
-
+        findNextPath();
     }
 
     @Override

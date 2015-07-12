@@ -7,20 +7,15 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public class Player extends Entity{
 
-    int score;
-
     public Player(Body body) {
         super(body);
         this.setSize(.1f);
-        this.score = 0;
     }
 
     @Override
     public void barrierCollision() {
 
     }
-
-
 
     @Override
     public void update(float dt) {

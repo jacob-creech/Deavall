@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import static com.badlogic.gdx.math.MathUtils.random;
 import static com.badlogic.gdx.math.MathUtils.randomSign;
 import static com.devour.all.handlers.Box2DVars.*;
+import static java.lang.Thread.sleep;
+
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,7 +20,6 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.devour.all.Algorithm.QuickSort;
 import com.devour.all.entities.Enemy;
 import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
@@ -28,6 +29,7 @@ import com.devour.all.handlers.Background;
 import com.devour.all.handlers.EntityContactListener;
 import com.devour.all.handlers.EventHandler;
 import com.devour.all.handlers.GameStateManager;
+import com.devour.all.handlers.Loading;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -35,10 +37,6 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Random;
 
 
@@ -56,16 +54,15 @@ public class Play extends GameState {
     private static ArrayList<Food> foods;
     private static Player player;
     private EventHandler eventHandler;
-
-    public static SimpleWeightedGraph entityGraph;
-    public static QuickSort sorter;
+    private Loading loading;
+    private boolean loadingDone;
 
     public static Player getPlayer() { return player; }
     public static ArrayList<Food> getFoods() { return foods; }
 
     private OrthographicCamera b2dcam;
     private Background background;
-    private Texture backgroundTexture;
+    Texture backgroundTexture;
     private HUD hud;
 
     public Play(GameStateManager gsm){
@@ -75,6 +72,8 @@ public class Play extends GameState {
         world = new World(new Vector2(0, 0), true);
         eventHandler = new EventHandler();
         world.setContactListener(new EntityContactListener(eventHandler));
+        loading = new Loading();
+        loadingDone = false;
 
         b2dr = new Box2DDebugRenderer();
         b2dcam = new OrthographicCamera();
@@ -83,7 +82,6 @@ public class Play extends GameState {
         // Initialize arrayLists
         enemies = new ArrayList<Enemy>();
         foods = new ArrayList<Food>();
-        sorter = new QuickSort();
 
         // Create the area for the entities
         createArea();
@@ -92,23 +90,28 @@ public class Play extends GameState {
         createPlayer();
         hud = new HUD(player);
 
-        // Create food
-        System.out.println("Creating Food");
-        for(int i = 0; i < 500; i++){
-            createFood();
-        }
-        System.out.println("Done Creating Food");
-        // Create enemies
-        for(int i = 0; i < 8; i++){
-            createEnemy();
-        }
-        System.out.println("Done Creating Enemies");
+
         // Create Background
         backgroundTexture = new Texture(Gdx.files.internal("android/assets/grid.png"));
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         //TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
         //background = new Background(textureRegion, mainCamera, 1f);
 
+    }
+
+    public void load(){
+        // Create food
+        if(loading.getPercent() < 500){
+            createFood();
+        }
+        // Create enemies
+        else if(loading.getPercent() < 550){
+            createEnemy();
+        }
+        loading.incPercent();
+        if(loading.getPercent() > 550){
+            loadingDone = true;
+        }
     }
 
     public void createArea(){
@@ -244,7 +247,6 @@ public class Play extends GameState {
         circle.dispose();
 
         enemy.findNextPath();
-
         enemies.add(enemy);
     }
 
@@ -281,78 +283,47 @@ public class Play extends GameState {
         body.setUserData(food);
         circle.dispose();
 
+        for(int i = 0; i < enemies.size(); i++){
+            enemies.get(i).addFoodBody(body);
+        }
         foods.add(food);
     }
-
-    public void shrinkBody(Body body){
-        System.out.println(body.getUserData().getClass().getName());
-        if(body.getUserData() instanceof Enemy){
-            Enemy enemy = (Enemy)body.getUserData();
-            System.out.println("Shrinking Enemy");
-            //enemy.shrink(body);
-        }
-        if(body.getUserData() instanceof Player){
-            Player player = (Player)body.getUserData();
-            System.out.println("Shrinking Player");
-            //player.shrink(body);
-        }
-    }
-
 
     @Override
     public void handleInput() {  }
 
     int playerY;
     int playerX;
-    int shrinkTimer = 0;
-    int enemyIndex = 0;
-    Body bodyToShrink;
     @Override
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
+        if(loadingDone) {
+            playerX = (int) (player.getBody().getPosition().x * PPM * 2) % 98;
+            playerY = (int) (player.getBody().getPosition().y * PPM * 1.5) % 98;
 
-        playerX = (int)(player.getBody().getPosition().x * PPM * 2) % 98;
-        playerY = (int)(player.getBody().getPosition().y * PPM * 1.5) % 98;
-
-        ArrayList<Body> bodies = eventHandler.getBodies();
-        for(int i = 0; i < bodies.size(); i++) {
-            Body b = bodies.get(i);
-            if(b.getUserData() instanceof Food) {
-                foods.remove(b.getUserData());
+            ArrayList<Body> bodies = eventHandler.getBodies();
+            for (int i = 0; i < bodies.size(); i++) {
+                Body b = bodies.get(i);
+                if (b.getUserData() instanceof Food) {
+                    foods.remove(b.getUserData());
+                    Play.createFood();
+                } else if (b.getUserData() instanceof Enemy) {
+                    enemies.remove(b.getUserData());
+                    createEnemy();
+                }
+                world.destroyBody(bodies.get(i));
             }
-            else if(b.getUserData() instanceof Enemy){
-                enemies.remove(b.getUserData());
-            }
-            world.destroyBody(bodies.get(i));
-            Play.createFood();
-        }
-        bodies.clear();
+            bodies.clear();
 
-        for(int i = 0; i < enemies.size(); i++){
-            if(enemies.get(i).getBody().getLinearVelocity().isZero()){
-                enemies.get(i).findNextPath();
-            }
-        }
-
-        /*
-        * Every 3 seconds, you lose 1% of your mass. This
-        * Balances the game and creates a bit more of a
-        * struggle instead of continuously increasing.
-         */
-        if(shrinkTimer % 30 == 0){
-            bodyToShrink = enemies.get(enemyIndex % enemies.size()).getBody();
-            //shrinkBody(bodyToShrink);
-            enemyIndex++;
-            if(shrinkTimer % 180 == 0){
-                //shrinkBody(player.getBody());
+            for (int i = 0; i < enemies.size(); i++) {
+                if (enemies.get(i).getBody().getLinearVelocity().isZero()) {
+                    enemies.get(i).findNextPath();
+                }
             }
         }
-
-        shrinkTimer++;
-
-        if(eventHandler.getGameOver()){
-            // Gameover screen
+        else{
+            load();
         }
 
     }
@@ -365,27 +336,35 @@ public class Play extends GameState {
 
         sb.begin();
 
-        sb.setProjectionMatrix(hudCamera.combined);
-        sb.draw(backgroundTexture, 0,0,playerX,-playerY,(int)WIDTH,(int)HEIGHT);
-        hud.render();
+        if(loadingDone) {
+            sb.setProjectionMatrix(hudCamera.combined);
+            sb.draw(backgroundTexture, 0, 0, playerX, -playerY, (int) WIDTH, (int) HEIGHT);
+            hud.render();
 
-        sb.setProjectionMatrix(mainCamera.combined);
-        mainCamera.position.set(
-                player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
-                player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
-                0
-        );
-        mainCamera.update();
+            sb.setProjectionMatrix(mainCamera.combined);
+            mainCamera.position.set(
+                    player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
+                    player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
+                    0
+            );
+            mainCamera.update();
+        }
+        else{
+            loading.render();
+        }
+
         sb.end();
 
         // Draw box2d world
-        b2dcam.position.set(
-                player.getBody().getPosition().x ,//+ WIDTH / 8 / PPM ,
-                player.getBody().getPosition().y,
-                0
-        );
-        b2dcam.update();
-        b2dr.render(world, b2dcam.combined);
+        if(loadingDone) {
+            b2dcam.position.set(
+                    player.getBody().getPosition().x,//+ WIDTH / 8 / PPM ,
+                    player.getBody().getPosition().y,
+                    0
+            );
+            b2dcam.update();
+            b2dr.render(world, b2dcam.combined);
+        }
 
     }
 

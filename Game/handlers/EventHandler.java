@@ -22,14 +22,18 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class EventHandler {
 
     private boolean gameover;
+    private boolean win;
     private ArrayList<Body> bodiesToRemove;
 
     public EventHandler(){
         super();
         gameover = false;
+        win = false;
         bodiesToRemove = new ArrayList<Body>();
     }
 
+    public boolean getWin() { return win; }
+    public void setWin(Boolean b) { win = b; }
     public boolean getGameOver() { return gameover; }
     public void setGameover(Boolean b) { gameover = b; }
 
@@ -77,18 +81,17 @@ public class EventHandler {
         * is 25% bigger than the other, then remove the smaller
         * and increase the size of the larger.
          */
-        System.out.println("enemy collision");
         Enemy enemyA = (Enemy)fixtureA.getBody().getUserData();
         Enemy enemyB = (Enemy)fixtureB.getBody().getUserData();
         if(enemyA.getSize() > (enemyB.getSize()*1.25f)){
-            enemyA.resize(enemyA.getBody(), enemyA.getSize() + (enemyB.getSize()*.3f));
-            enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.3f));
+            enemyA.resize(enemyA.getBody(), enemyA.getSize() + (enemyB.getSize()*.1f));
+            enemyA.setSize(enemyA.getSize() + (enemyB.getSize()*.1f));
             addToRemove(enemyB.getBody());
             followNextPath(enemyA);
         }
         else if(enemyB.getSize() > (enemyA.getSize()*1.25f)){
-            enemyB.resize(enemyB.getBody(), enemyB.getSize() + (enemyA.getSize()*.3f));
-            enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.3f));
+            enemyB.resize(enemyB.getBody(), enemyB.getSize() + (enemyA.getSize()*.1f));
+            enemyB.setSize(enemyB.getSize() + (enemyA.getSize()*.1f));
             addToRemove(enemyA.getBody());
             followNextPath(enemyB);
         }
@@ -105,7 +108,7 @@ public class EventHandler {
         * whether or not the player or enemy can eat one
         * another on contact.
          */
-        System.out.println("food collision");
+        //System.out.println("FOOD COLLISION");
         if(fixtureA.getBody().getUserData() instanceof Enemy){
             Enemy enemy = (Enemy)fixtureA.getBody().getUserData();
             resizeEnemy(enemy);
@@ -133,9 +136,7 @@ public class EventHandler {
         }
     }
 
-    public void followNextPath(Enemy enemy){
-        enemy.findNextPath();
-    }
+    public void followNextPath(Enemy enemy){ enemy.findNextPath(); }
 
     public void handleVirusCol(Fixture fixtureA, Fixture fixtureB) {}
 
@@ -238,18 +239,14 @@ public class EventHandler {
     public void resizePlayer(Player player){
         float size = player.getSize();
         Body body = player.getBody();
-        int factor = (int)(Math.log(player.getScoreInt())/Math.log(100));
-        float newSizeInc = (float)(.001 / Math.pow(10, factor));
-        player.setSize(size + (newSizeInc));
-        player.resize(body, size + (newSizeInc));
+        player.setSize(size + .001f);
+        player.resize(body, size + .001f);
     }
     public void resizeEnemy(Enemy enemy){
         float size = enemy.getSize();
         Body body = enemy.getBody();
-        int factor = (int)(Math.log(enemy.getScoreInt())/Math.log(100));
-        float newSizeInc = (float)(.001 / Math.pow(10, factor));
-        enemy.setSize(size + newSizeInc);
-        enemy.resize(body, size + newSizeInc);
+        enemy.setSize(size + .001f);
+        enemy.resize(body, size + .001f);
     }
 
     public void addToRemove(Body body){ bodiesToRemove.add(body); }
