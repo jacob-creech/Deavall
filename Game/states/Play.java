@@ -101,15 +101,15 @@ public class Play extends GameState {
 
     public void load(){
         // Create food
-        if(loading.getPercent() < 500){
+        if(loading.getBodiesDone() < 500){
             createFood();
         }
         // Create enemies
-        else if(loading.getPercent() < 550){
+        else if(loading.getBodiesDone() < 550){
             createEnemy();
         }
-        loading.incPercent();
-        if(loading.getPercent() > 550){
+        loading.incBodiesDone();
+        if(loading.getBodiesDone() > 550){
             loadingDone = true;
         }
     }

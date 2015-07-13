@@ -3,6 +3,7 @@ package com.devour.all.handlers;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.devour.all.main.Game;
 
 /**
@@ -12,22 +13,46 @@ public class Loading extends ApplicationAdapter {
 
     Texture screen;
     Texture loadingBar;
-    int percent = 0;
+    BitmapFont font;
+    float percent;
+    int BodiesDone;
+    final int totalBodies = 550;
+    float WIDTH = Gdx.graphics.getWidth();
+    float HEIGHT = Gdx.graphics.getHeight();
 
     public Loading(){
         screen = new Texture(Gdx.files.internal("android/assets/glassPanel_Projection.png"));
         loadingBar = new Texture(Gdx.files.internal("android/assets/buttonLong_grey.png"));
+        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        BodiesDone = 0;
+        percent = 0;
     }
 
-    public int getPercent() { return percent; }
-    public void incPercent() { percent++; }
+    public int getBodiesDone() { return BodiesDone; }
+    public void incBodiesDone() { BodiesDone++; }
+    public float getPercent() {
+        percent = (float)BodiesDone / totalBodies;
+        return percent;
+    }
 
     @Override
     public void render(){
         Game.getSpriteBatch().draw(screen, 0, 0,
                 screen.getWidth() * (Gdx.graphics.getWidth() / 100f),
-                screen.getHeight() * (Gdx.graphics.getHeight() / 100f));
-        //Game.getSpriteBatch().draw();
+                screen.getHeight() * (Gdx.graphics.getHeight() / 100f)
+        );
+        Game.getSpriteBatch().draw(loadingBar,
+                WIDTH/4,
+                3*HEIGHT/8,
+                WIDTH/2 * getPercent(),
+                HEIGHT/10
+        );
+        if(getBodiesDone() < 500) {
+            font.draw(Game.getSpriteBatch(), "Loading food", WIDTH / 2 - 96, 21 * HEIGHT / 40);
+        }
+        else if(getBodiesDone() < 550) {
+            font.draw(Game.getSpriteBatch(), "Loading enemies", WIDTH / 2 - 120, 21 * HEIGHT / 40);
+        }
     }
 
     public void dispose(){
