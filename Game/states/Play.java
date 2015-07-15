@@ -294,6 +294,7 @@ public class Play extends GameState {
 
     int playerY;
     int playerX;
+    int shrinkTimer = 0;
     @Override
     public void update(float dt) {
         handleInput();
@@ -319,6 +320,15 @@ public class Play extends GameState {
             for (int i = 0; i < enemies.size(); i++) {
                 if (enemies.get(i).getBody().getLinearVelocity().isZero()) {
                     enemies.get(i).findNextPath();
+                }
+            }
+            shrinkTimer++;
+            if(shrinkTimer % 180 == 0){
+                player.shrink(player.getBody());
+            }
+            if(shrinkTimer % 120 == 0){
+                for(int i = 0; i < enemies.size(); i++){
+                    enemies.get(i).shrink(enemies.get(i).getBody());
                 }
             }
         }
