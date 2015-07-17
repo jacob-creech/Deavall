@@ -348,7 +348,8 @@ public class Play extends GameState {
 
         if(loadingDone) {
             sb.setProjectionMatrix(hudCamera.combined);
-            sb.draw(backgroundTexture, 0, 0, playerX, -playerY, (int) WIDTH, (int) HEIGHT);
+            sb.draw(backgroundTexture, 0 - (int) (WIDTH * hudCamera.zoom), 0 - (int) (HEIGHT * hudCamera.zoom), playerX, -playerY,
+                    (int) (2 * WIDTH * hudCamera.zoom), (int) (2 * HEIGHT * hudCamera.zoom));
             hud.render();
 
             sb.setProjectionMatrix(mainCamera.combined);
@@ -357,7 +358,14 @@ public class Play extends GameState {
                     player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
                     0
             );
+            if(eventHandler.getMainCamZoom() > 0){
+                mainCamera.zoom += .002 * eventHandler.getMainCamZoom();
+                hudCamera.zoom += .002 * eventHandler.getMainCamZoom();
+                eventHandler.setMainCamZoom(0);
+            }
+
             mainCamera.update();
+            hudCamera.update();
         }
         else{
             loading.render();
@@ -372,6 +380,11 @@ public class Play extends GameState {
                     player.getBody().getPosition().y,
                     0
             );
+            if(eventHandler.getBox2dZoom() > 0){
+                b2dcam.zoom += .002 * eventHandler.getBox2dZoom();
+                eventHandler.setBox2dZoom(0);
+            }
+
             b2dcam.update();
             b2dr.render(world, b2dcam.combined);
         }

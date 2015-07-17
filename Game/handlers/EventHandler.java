@@ -23,6 +23,8 @@ public class EventHandler {
 
     private boolean gameover;
     private boolean win;
+    private int box2dZoom;
+    private int mainCamZoom;
     private ArrayList<Body> bodiesToRemove;
 
     public EventHandler(){
@@ -30,7 +32,14 @@ public class EventHandler {
         gameover = false;
         win = false;
         bodiesToRemove = new ArrayList<Body>();
+        box2dZoom = 0;
+        mainCamZoom = 0;
     }
+
+    public int getBox2dZoom() { return box2dZoom; }
+    public void setBox2dZoom(int zoom) { box2dZoom = zoom; }
+    public int getMainCamZoom() { return mainCamZoom; }
+    public void setMainCamZoom(int zoom) { mainCamZoom = zoom; }
 
     public boolean getWin() { return win; }
     public void setWin(Boolean b) { win = b; }
@@ -71,6 +80,8 @@ public class EventHandler {
             player.resize(player.getBody(), player.getSize() + (enemy.getSize() * .3f));
             player.setSize(player.getSize() + (enemy.getSize() * .3f));
             addToRemove(enemy.getBody());
+            box2dZoom+= (enemy.getSize() * .3f / .1f);
+            mainCamZoom+= (enemy.getSize() * .3f / .1f);
         }
     }
     public void handleEnemyCol(Fixture fixtureA, Fixture fixtureB) {
@@ -241,6 +252,8 @@ public class EventHandler {
         Body body = player.getBody();
         player.setSize(size + .001f);
         player.resize(body, size + .001f);
+        box2dZoom++;
+        mainCamZoom++;
     }
     public void resizeEnemy(Enemy enemy){
         float size = enemy.getSize();
