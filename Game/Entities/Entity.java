@@ -1,5 +1,7 @@
 package com.devour.all.entities;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -11,6 +13,8 @@ public abstract class Entity {
     protected Body body;
     private float size;
     int score;
+    Pixmap pixmap;
+    Texture pixmapTexture;
 
     public Entity(Body body){
         this.body = body;
