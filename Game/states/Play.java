@@ -65,6 +65,8 @@ public class Play extends GameState {
     Texture backgroundTexture;
     private HUD hud;
 
+    boolean debug = true;
+
     public Play(GameStateManager gsm){
         super(gsm);
 
@@ -356,6 +358,12 @@ public class Play extends GameState {
             for(int i = 0; i < foods.size(); i++){
                 foods.get(i).render();
             }
+            for(int i = 0; i < enemies.size(); i++){
+                enemies.get(i).render();
+            }
+            sb.setProjectionMatrix(hudCamera.combined);
+            player.render();
+
             mainCamera.position.set(
                     player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
                     player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
@@ -377,19 +385,21 @@ public class Play extends GameState {
         sb.end();
 
         // Draw box2d world
-        if(loadingDone) {
-            b2dcam.position.set(
-                    player.getBody().getPosition().x,//+ WIDTH / 8 / PPM ,
-                    player.getBody().getPosition().y,
-                    0
-            );
-            if(eventHandler.getBox2dZoom() > 0){
-                b2dcam.zoom += .002 * eventHandler.getBox2dZoom();
-                eventHandler.setBox2dZoom(0);
-            }
+        if(debug) {
+            if (loadingDone) {
+                b2dcam.position.set(
+                        player.getBody().getPosition().x,//+ WIDTH / 8 / PPM ,
+                        player.getBody().getPosition().y,
+                        0
+                );
+                if (eventHandler.getBox2dZoom() > 0) {
+                    b2dcam.zoom += .002 * eventHandler.getBox2dZoom();
+                    eventHandler.setBox2dZoom(0);
+                }
 
-            b2dcam.update();
-            b2dr.render(world, b2dcam.combined);
+                b2dcam.update();
+                b2dr.render(world, b2dcam.combined);
+            }
         }
 
     }

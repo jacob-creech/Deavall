@@ -1,7 +1,11 @@
 package com.devour.all.entities;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.devour.all.handlers.Box2DVars;
+import com.devour.all.main.Game;
 import com.devour.all.states.Play;
 
 import org.jgrapht.alg.DijkstraShortestPath;
@@ -36,6 +40,12 @@ public class Enemy extends Entity {
         bodies = new HashMap<Double, Body>();
         pathToGo = new ArrayList<Float>();
         index = 0;
+        int pixmapRadius = Math.round(this.getSize()*1000);
+        this.pixmap = new Pixmap(pixmapRadius,pixmapRadius, Pixmap.Format.RGBA8888);
+        this.pixmap.setColor(random(0,255),random(0,255),random(0,255),1f);
+        this.pixmap.fillCircle(pixmapRadius/2,pixmapRadius/2,pixmapRadius/2);
+        this.pixmapTexture = new Texture(pixmap, Pixmap.Format.RGBA8888, false);
+        this.pixmap.dispose();
 
     }
 
@@ -105,6 +115,14 @@ public class Enemy extends Entity {
         body.setLinearVelocity(direction.scl(this.getSpeed()));
     }
 
+    public void makePixmap(){
+        int pixmapRadius = Math.round(this.getSize()*1000);
+        this.pixmap = new Pixmap(pixmapRadius,pixmapRadius, Pixmap.Format.RGBA8888);
+        this.pixmap.setColor(random(0,255),random(0,255),random(0,255),1f);
+        this.pixmap.fillCircle(pixmapRadius/2,pixmapRadius/2,pixmapRadius/2);
+        this.pixmapTexture = new Texture(pixmap, Pixmap.Format.RGBA8888, false);
+        this.pixmap.dispose();
+    }
 
     @Override
     public void barrierCollision() {
@@ -118,11 +136,18 @@ public class Enemy extends Entity {
 
     @Override
     public void render() {
-
+        float xPos = body.getPosition().x * Box2DVars.PPM * 2 + 150;
+        float yPos = body.getPosition().y * Box2DVars.PPM * 1.5f + 112 + Play.getPlayer().getBody().getPosition().y * Box2DVars.PPM * 2.5f;
+        Game.getSpriteBatch().draw(pixmapTexture,
+                xPos - this.getSize() * 250,
+                yPos - this.getSize() * 250,
+                this.getSize() * 600,
+                this.getSize() * 600
+                );
     }
 
     @Override
     public void dispose() {
-
+        this.pixmapTexture.dispose();
     }
 }
