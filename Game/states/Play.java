@@ -10,6 +10,8 @@ import static java.lang.Thread.sleep;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -20,6 +22,9 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.devour.all.entities.Enemy;
 import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
@@ -30,6 +35,8 @@ import com.devour.all.handlers.EntityContactListener;
 import com.devour.all.handlers.EventHandler;
 import com.devour.all.handlers.GameStateManager;
 import com.devour.all.handlers.Loading;
+import com.devour.all.handlers.PlayerInputProcessor;
+import com.devour.all.main.Game;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -62,8 +69,14 @@ public class Play extends GameState {
 
     private OrthographicCamera b2dcam;
     private Background background;
-    Texture backgroundTexture;
+    private Texture backgroundTexture;
+    private TextureAtlas buttonAtlas;
+    private TextButton.TextButtonStyle ButtonStyle;
+    private TextButton retryButton;
+    private BitmapFont font;
     private HUD hud;
+    private Stage stage;
+    private Skin skin;
 
     boolean debug = true;
 
@@ -76,6 +89,8 @@ public class Play extends GameState {
         world.setContactListener(new EntityContactListener(eventHandler));
         loading = new Loading();
         loadingDone = false;
+        stage = new Stage();
+        skin = new Skin();
 
         b2dr = new Box2DDebugRenderer();
         b2dcam = new OrthographicCamera();
@@ -98,7 +113,19 @@ public class Play extends GameState {
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         //TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
         //background = new Background(textureRegion, mainCamera, 1f);
-
+        // Create selection buttons
+        buttonAtlas = new TextureAtlas(Gdx.files.internal("android/assets/defaultButton.atlas"));
+        skin.addRegions(buttonAtlas);
+        ButtonStyle = new TextButton.TextButtonStyle();
+        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        ButtonStyle.font = font;
+        ButtonStyle.up = skin.getDrawable("buttonLong_blue");
+        ButtonStyle.down = skin.getDrawable("buttonLong_blue_pressed");
+        retryButton = new TextButton("Retry", ButtonStyle);
+        float retryHeight = skin.getDrawable("buttonLong_blue").getMinHeight();
+        float retryWidth = skin.getDrawable("buttonLong_blue").getMinWidth();
+        retryButton.setPosition(Gdx.graphics.getWidth()/2 - (retryWidth/2), Gdx.graphics.getHeight()/4 - (retryHeight/2));
+        stage.addActor(retryButton);
     }
 
     public void load(){
@@ -291,16 +318,60 @@ public class Play extends GameState {
         foods.add(food);
     }
 
-    @Override
-    public void handleInput() {  }
+    public void startGameover(){
+        Gdx.input.setInputProcessor(stage);
 
+    }
+
+    public void drawScore(){
+        font.setFixedWidthGlyphs("0123456789");
+        String score = String.valueOf(Play.getPlayer().getScoreString());
+        font.draw(sb, score, Gdx.graphics.getWidth()/2, 4*Gdx.graphics.getHeight()/6);
+    }
+
+    public void restartGame(){
+        world.destroyBody(player.getBody());
+        createPlayer();
+        resetSizes();
+        mainCamera.zoom = 0;
+        eventHandler.setGameover(false);
+        gameOver = true;
+        Gdx.input.setInputProcessor(Game.input);
+    }
+
+    public void resetSizes(){
+        for(int i = 0; i < enemies.size(); i++){
+            enemies.get(i).reset();
+        }
+    }
+
+
+    @Override
+    public void handleInput() {
+        if(retryButton.isChecked()){
+            restartGame();
+            retryButton.setChecked(false);
+            System.out.println("retry");
+        }
+    }
+
+    private boolean gameOver = true;
     int playerY;
     int playerX;
     int shrinkTimer = 0;
     @Override
     public void update(float dt) {
         handleInput();
-        world.step(dt, 6, 2);
+
+        // Update world only if not GameOver
+        if(!eventHandler.getGameOver()){
+            world.step(dt, 6, 2);
+        }
+        else if(gameOver){
+            gameOver = false;
+            startGameover();
+        }
+
         if(loadingDone) {
             playerX = (int) (player.getBody().getPosition().x * PPM * 2) % 98;
             playerY = (int) (player.getBody().getPosition().y * PPM * 1.5) % 98;
@@ -347,39 +418,47 @@ public class Play extends GameState {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         sb.begin();
+        if(!eventHandler.getGameOver()) {
+            if (loadingDone) {
+                sb.setProjectionMatrix(hudCamera.combined);
+                sb.draw(backgroundTexture, 0 - (int) (WIDTH * hudCamera.zoom), 0 - (int) (HEIGHT * hudCamera.zoom), playerX, -playerY,
+                        (int) (2 * WIDTH * hudCamera.zoom), (int) (2 * HEIGHT * hudCamera.zoom));
+                hud.render();
 
-        if(loadingDone) {
+                sb.setProjectionMatrix(mainCamera.combined);
+                for (int i = 0; i < foods.size(); i++) {
+                    foods.get(i).render();
+                }
+                for (int i = 0; i < enemies.size(); i++) {
+                    enemies.get(i).render();
+                }
+                sb.setProjectionMatrix(hudCamera.combined);
+                player.render();
+
+                mainCamera.position.set(
+                        player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
+                        player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
+                        0
+                );
+                if (eventHandler.getMainCamZoom() > 0) {
+                    mainCamera.zoom += .002 * eventHandler.getMainCamZoom();
+                    hudCamera.zoom += .002 * eventHandler.getMainCamZoom();
+                    eventHandler.setMainCamZoom(0);
+                }
+
+                mainCamera.update();
+                hudCamera.update();
+            } else {
+                loading.render();
+            }
+        }
+        else{
             sb.setProjectionMatrix(hudCamera.combined);
             sb.draw(backgroundTexture, 0 - (int) (WIDTH * hudCamera.zoom), 0 - (int) (HEIGHT * hudCamera.zoom), playerX, -playerY,
                     (int) (2 * WIDTH * hudCamera.zoom), (int) (2 * HEIGHT * hudCamera.zoom));
-            hud.render();
-
-            sb.setProjectionMatrix(mainCamera.combined);
-            for(int i = 0; i < foods.size(); i++){
-                foods.get(i).render();
-            }
-            for(int i = 0; i < enemies.size(); i++){
-                enemies.get(i).render();
-            }
-            sb.setProjectionMatrix(hudCamera.combined);
-            player.render();
-
-            mainCamera.position.set(
-                    player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
-                    player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
-                    0
-            );
-            if(eventHandler.getMainCamZoom() > 0){
-                mainCamera.zoom += .002 * eventHandler.getMainCamZoom();
-                hudCamera.zoom += .002 * eventHandler.getMainCamZoom();
-                eventHandler.setMainCamZoom(0);
-            }
-
-            mainCamera.update();
-            hudCamera.update();
-        }
-        else{
-            loading.render();
+            drawScore();
+            font.draw(sb, "score: ", Gdx.graphics.getWidth() /4, 4*Gdx.graphics.getHeight()/6);
+            stage.draw();
         }
 
         sb.end();

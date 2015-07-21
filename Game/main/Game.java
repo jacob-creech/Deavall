@@ -16,6 +16,7 @@ public class Game extends ApplicationAdapter {
     private OrthographicCamera hudCamera;
 
     public static final float STEP = 1/60f;
+    public static PlayerInputProcessor input;
     private float accum;
 
     public static SpriteBatch getSpriteBatch() { return sb; }
@@ -27,6 +28,7 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
 
+        input = new PlayerInputProcessor();
         Gdx.input.setInputProcessor(new PlayerInputProcessor());
 
         sb = new SpriteBatch();

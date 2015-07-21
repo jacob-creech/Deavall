@@ -30,6 +30,7 @@ public class Enemy extends Entity {
     private List pathToGo;
     private int index;
     private HashMap<Double, Body> bodies;
+    float startSize;
 
     public Enemy(Body body) {
 
@@ -37,6 +38,7 @@ public class Enemy extends Entity {
         gather = true;
         flight = false;
         this.setSize(body.getFixtureList().get(0).getShape().getRadius());
+        startSize = this.getSize();
         bodies = new HashMap<Double, Body>();
         pathToGo = new ArrayList<Float>();
         index = 0;
@@ -55,6 +57,11 @@ public class Enemy extends Entity {
     public void setFlight(boolean b) { flight = b; }
     public List getPath() { return pathToGo; }
     public int getIndex() { return index; }
+
+    public void reset(){
+        this.setSize(startSize);
+        this.resize(this.body, startSize);
+    }
 
     public void populateMap(){
         for(int i = 0; i < Play.getFoods().size(); i++){
