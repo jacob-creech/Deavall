@@ -333,7 +333,9 @@ public class Play extends GameState {
         world.destroyBody(player.getBody());
         createPlayer();
         resetSizes();
-        mainCamera.zoom = 0;
+        mainCamera.zoom = 1;
+        hudCamera.zoom = 1;
+        b2dcam.zoom = 1;
         eventHandler.setGameover(false);
         gameOver = true;
         Gdx.input.setInputProcessor(Game.input);

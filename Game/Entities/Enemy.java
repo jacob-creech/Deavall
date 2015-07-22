@@ -104,7 +104,6 @@ public class Enemy extends Entity {
             index = 0;
             sortMap();
         }
-        //System.out.println(index + " " + body);
         if(foodBody != null){
             goToPoint(foodBody);
         }
