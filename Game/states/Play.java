@@ -325,7 +325,7 @@ public class Play extends GameState {
 
     public void drawScore(){
         font.setFixedWidthGlyphs("0123456789");
-        String score = String.valueOf(Play.getPlayer().getScoreString());
+        String score = String.valueOf(Play.getPlayer().returnHighscore());
         font.draw(sb, score, Gdx.graphics.getWidth()/2, 4*Gdx.graphics.getHeight()/6);
     }
 
@@ -353,7 +353,6 @@ public class Play extends GameState {
         if(retryButton.isChecked()){
             restartGame();
             retryButton.setChecked(false);
-            System.out.println("retry");
         }
     }
 
@@ -377,6 +376,8 @@ public class Play extends GameState {
         if(loadingDone) {
             playerX = (int) (player.getBody().getPosition().x * PPM * 2) % 98;
             playerY = (int) (player.getBody().getPosition().y * PPM * 1.5) % 98;
+
+            player.update(dt);
 
             ArrayList<Body> bodies = eventHandler.getBodies();
             for (int i = 0; i < bodies.size(); i++) {

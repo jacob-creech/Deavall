@@ -41,7 +41,6 @@ public abstract class Entity {
                 shape.setRadius(newRadius);
             }
         }
-
     }
 
     public String getScoreString(){
