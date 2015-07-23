@@ -19,6 +19,9 @@ public class Game extends ApplicationAdapter {
     public static PlayerInputProcessor input;
     private float accum;
 
+    public static float WIDTH;
+    public static float HEIGHT;
+
     public static SpriteBatch getSpriteBatch() { return sb; }
     public OrthographicCamera getMainCamera() { return mainCamera; }
     public OrthographicCamera getHudCamera() { return hudCamera; }
@@ -36,6 +39,9 @@ public class Game extends ApplicationAdapter {
         mainCamera.setToOrtho(false);
         hudCamera = new OrthographicCamera();
         hudCamera.setToOrtho(false);
+
+        WIDTH = Gdx.graphics.getWidth();
+        HEIGHT = Gdx.graphics.getHeight();
 
         gsm = new GameStateManager(this);
 

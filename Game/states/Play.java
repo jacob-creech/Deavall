@@ -91,6 +91,7 @@ public class Play extends GameState {
         loadingDone = false;
         stage = new Stage();
         skin = new Skin();
+        Gdx.input.setInputProcessor(Game.input);
 
         b2dr = new Box2DDebugRenderer();
         b2dcam = new OrthographicCamera();
