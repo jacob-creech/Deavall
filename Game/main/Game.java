@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.devour.all.handlers.GameStateManager;
 import com.devour.all.handlers.PlayerInputProcessor;
+import com.devour.all.handlers.ResourceManager;
 
 
 public class Game extends ApplicationAdapter {
@@ -27,6 +28,7 @@ public class Game extends ApplicationAdapter {
     public OrthographicCamera getHudCamera() { return hudCamera; }
 
     private GameStateManager gsm;
+    public static ResourceManager res;
 
     @Override
     public void create() {
@@ -42,6 +44,21 @@ public class Game extends ApplicationAdapter {
 
         WIDTH = Gdx.graphics.getWidth();
         HEIGHT = Gdx.graphics.getHeight();
+
+        // Easy switch for dev between desktop and android
+        boolean android = false;
+        String filePath = "";
+
+        if(!android){
+            filePath = "android/assets/";
+        }
+
+        res = new ResourceManager();
+        res.loadTexture(filePath+"buttonLong_grey.png", "loadingBar");
+        res.loadTextureAtlas(filePath+"defaultButton.atlas", "defaultButton");
+        res.loadTexture(filePath+"grid.png", "background");
+        res.loadTexture(filePath+"glassPanel_projection.png", "loadBackground");
+        res.loadFont(filePath+"visitor.fnt", "mainFont");
 
         gsm = new GameStateManager(this);
 

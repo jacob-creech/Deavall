@@ -110,15 +110,15 @@ public class Play extends GameState {
 
 
         // Create Background
-        backgroundTexture = new Texture(Gdx.files.internal("android/assets/grid.png"));
+        backgroundTexture = Game.res.getTexture("background");
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         //TextureRegion textureRegion = new TextureRegion(texture, 0, 0, 49, 49);
         //background = new Background(textureRegion, mainCamera, 1f);
         // Create selection buttons
-        buttonAtlas = new TextureAtlas(Gdx.files.internal("android/assets/defaultButton.atlas"));
+        buttonAtlas = Game.res.getTextureAtlas("defaultButton");
         skin.addRegions(buttonAtlas);
         ButtonStyle = new TextButton.TextButtonStyle();
-        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        font = Game.res.getFont("mainFont");
         ButtonStyle.font = font;
         ButtonStyle.up = skin.getDrawable("buttonLong_blue");
         ButtonStyle.down = skin.getDrawable("buttonLong_blue_pressed");
@@ -489,6 +489,9 @@ public class Play extends GameState {
 
     @Override
     public void dispose() {
+
         world.dispose();
+        Game.res.removeAll();
+
     }
 }

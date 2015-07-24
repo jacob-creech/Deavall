@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import java.util.HashMap;
@@ -17,12 +18,14 @@ public class ResourceManager {
     private HashMap<String, TextureAtlas> textureAtlases;
     private HashMap<String, Music> music;
     private HashMap<String, Sound> sounds;
+    private HashMap<String, BitmapFont> fonts;
 
     public ResourceManager(){
         textures = new HashMap<String, Texture>();
         textureAtlases = new HashMap<String, TextureAtlas>();
         music = new HashMap<String, Music>();
         sounds = new HashMap<String, Sound>();
+        fonts = new HashMap<String, BitmapFont>();
     }
 
 
@@ -95,4 +98,55 @@ public class ResourceManager {
             sound.dispose();
         }
     }
+
+    /*
+    * FONTS
+     */
+    public void loadFont(String path, String key) {
+        BitmapFont font = new BitmapFont(Gdx.files.internal(path));
+        fonts.put(key, font);
+    }
+    public BitmapFont getFont(String key) {
+        return fonts.get(key);
+    }
+    public void removeFont(String key) {
+        BitmapFont font = fonts.get(key);
+        if(font != null) {
+            fonts.remove(key);
+            font.dispose();
+        }
+    }
+
+    /*
+    * DISPOSING
+     */
+
+    public void removeAll() {
+        for(Object o : textures.values()) {
+            Texture tex = (Texture) o;
+            tex.dispose();
+        }
+        textures.clear();
+        for(Object o : music.values()) {
+            Music music = (Music) o;
+            music.dispose();
+        }
+        music.clear();
+        for(Object o : textureAtlases.values()) {
+            TextureAtlas atlas = (TextureAtlas) o;
+            atlas.dispose();
+        }
+        textureAtlases.clear();
+        for(Object o : fonts.values()) {
+            BitmapFont font = (BitmapFont) o;
+            font.dispose();
+        }
+        fonts.clear();
+        for(Object o : sounds.values()) {
+            Sound sound = (Sound) o;
+            sound.dispose();
+        }
+        sounds.clear();
+    }
+
 }

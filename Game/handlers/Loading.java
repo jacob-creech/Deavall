@@ -21,9 +21,9 @@ public class Loading extends ApplicationAdapter {
     float HEIGHT = Gdx.graphics.getHeight();
 
     public Loading(){
-        screen = new Texture(Gdx.files.internal("android/assets/glassPanel_Projection.png"));
-        loadingBar = new Texture(Gdx.files.internal("android/assets/buttonLong_grey.png"));
-        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        screen = Game.res.getTexture("loadBackground");
+        loadingBar = Game.res.getTexture("loadingBar");
+        font = Game.res.getFont("mainFont");
         BodiesDone = 0;
         percent = 0;
     }
@@ -55,8 +55,5 @@ public class Loading extends ApplicationAdapter {
         }
     }
 
-    public void dispose(){
-        screen.dispose();
-        loadingBar.dispose();
-    }
+    public void dispose(){ }
 }

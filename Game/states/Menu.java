@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.devour.all.handlers.GameStateManager;
+import com.devour.all.main.Game;
+
 import static com.devour.all.main.Game.*;
 
 /**
@@ -28,17 +30,17 @@ public class Menu extends GameState {
     public Menu(GameStateManager gsm){
         super(gsm);
 
-        background = new Texture(Gdx.files.internal("android/assets/grid.png"));
+        background = Game.res.getTexture("background");
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         skin = new Skin();
         buttonStyle = new TextButton.TextButtonStyle();
-        buttonAtlas = new TextureAtlas(Gdx.files.internal("android/assets/defaultButton.atlas"));
+        buttonAtlas = Game.res.getTextureAtlas("defaultButton");
 
         skin.addRegions(buttonAtlas);
-        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        font = Game.res.getFont("mainFont");
         buttonStyle.font = font;
         buttonStyle.up = skin.getDrawable("buttonLong_blue");
         buttonStyle.down = skin.getDrawable("buttonLong_blue_pressed");
@@ -75,8 +77,5 @@ public class Menu extends GameState {
     @Override
     public void dispose() {
         stage.dispose();
-        font.dispose();
-        skin.dispose();
-        buttonAtlas.dispose();
     }
 }
