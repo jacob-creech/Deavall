@@ -34,6 +34,7 @@ import com.devour.all.handlers.Background;
 import com.devour.all.handlers.EntityContactListener;
 import com.devour.all.handlers.EventHandler;
 import com.devour.all.handlers.GameStateManager;
+import com.devour.all.handlers.InputHandler;
 import com.devour.all.handlers.Loading;
 import com.devour.all.handlers.PlayerInputProcessor;
 import com.devour.all.main.Game;
@@ -63,6 +64,7 @@ public class Play extends GameState {
     private EventHandler eventHandler;
     private Loading loading;
     private boolean loadingDone;
+    private static InputHandler inputHandler;
 
     public static Player getPlayer() { return player; }
     public static ArrayList<Food> getFoods() { return foods; }
@@ -348,12 +350,25 @@ public class Play extends GameState {
         }
     }
 
-
+    int doubleTapTimer = 0;
+    boolean doubleTap = false;
+    boolean firstTap = false;
     @Override
     public void handleInput() {
         if(retryButton.isChecked()){
             restartGame();
             retryButton.setChecked(false);
+        }
+        if(inputHandler.getTap()){
+            inputHandler.setTap(false);
+            firstTap = true;
+            if(doubleTapTimer < 30){
+                doubleTap = true;
+            }
+        }
+        if(doubleTap){
+            // Do Split
+            doubleTap = false;
         }
     }
 
@@ -364,7 +379,12 @@ public class Play extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-
+        if(firstTap){
+            doubleTapTimer++;
+            if(doubleTapTimer > 30){
+                firstTap = false;
+            }
+        }
         // Update world only if not GameOver
         if(!eventHandler.getGameOver()){
             world.step(dt, 6, 2);

@@ -5,11 +5,15 @@ package com.devour.all.handlers;
  */
 public class InputHandler {
     static boolean touchDown = false;
+    static boolean tap = false;
+    static boolean doubleTap = false;
     static float xPos, yPos;
     public static void setTouch(float x, float y) {
         xPos = x;
         yPos = y;
     }
+    public static void setTap(boolean b){ tap = b; }
+    public static boolean getTap() { return tap; }
     public static float getXPos() { return xPos; }
     public static float getYPos() { return yPos; }
 

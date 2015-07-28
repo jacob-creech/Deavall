@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.input.GestureDetector;
 import com.devour.all.handlers.GameStateManager;
 import com.devour.all.handlers.PlayerInputProcessor;
 import com.devour.all.handlers.ResourceManager;
@@ -17,7 +18,7 @@ public class Game extends ApplicationAdapter {
     private OrthographicCamera hudCamera;
 
     public static final float STEP = 1/60f;
-    public static PlayerInputProcessor input;
+    public static GestureDetector input;
     private float accum;
 
     public static float WIDTH;
@@ -33,8 +34,8 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
 
-        input = new PlayerInputProcessor();
-        Gdx.input.setInputProcessor(new PlayerInputProcessor());
+        input = new PlayerInputProcessor().returnGestureDetector();
+        Gdx.input.setInputProcessor(input);
 
         sb = new SpriteBatch();
         mainCamera = new OrthographicCamera();
