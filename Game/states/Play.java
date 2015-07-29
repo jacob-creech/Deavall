@@ -447,7 +447,7 @@ public class Play extends GameState {
                 sb.setProjectionMatrix(hudCamera.combined);
                 sb.draw(backgroundTexture, 0 - (int) (WIDTH * hudCamera.zoom), 0 - (int) (HEIGHT * hudCamera.zoom), playerX, -playerY,
                         (int) (2 * WIDTH * hudCamera.zoom), (int) (2 * HEIGHT * hudCamera.zoom));
-                hud.render();
+
 
                 sb.setProjectionMatrix(mainCamera.combined);
                 for (int i = 0; i < foods.size(); i++) {
@@ -458,6 +458,7 @@ public class Play extends GameState {
                 }
                 sb.setProjectionMatrix(hudCamera.combined);
                 player.render();
+                hud.render();
 
                 mainCamera.position.set(
                         player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,

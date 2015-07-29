@@ -14,19 +14,19 @@ public class Game extends ApplicationAdapter {
 
     public static final String TITLE = "Deavall";
     private static SpriteBatch sb;
-    private OrthographicCamera mainCamera;
-    private OrthographicCamera hudCamera;
+    private static OrthographicCamera mainCamera;
+    private static OrthographicCamera hudCamera;
 
     public static final float STEP = 1/60f;
-    public static GestureDetector input;
+    public static PlayerInputProcessor input;
     private float accum;
 
     public static float WIDTH;
     public static float HEIGHT;
 
     public static SpriteBatch getSpriteBatch() { return sb; }
-    public OrthographicCamera getMainCamera() { return mainCamera; }
-    public OrthographicCamera getHudCamera() { return hudCamera; }
+    public static OrthographicCamera getMainCamera() { return mainCamera; }
+    public static OrthographicCamera getHudCamera() { return hudCamera; }
 
     private GameStateManager gsm;
     public static ResourceManager res;
@@ -34,7 +34,7 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
 
-        input = new PlayerInputProcessor().returnGestureDetector();
+        input = new PlayerInputProcessor();
         Gdx.input.setInputProcessor(input);
 
         sb = new SpriteBatch();

@@ -1,10 +1,14 @@
 package com.devour.all.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.devour.all.handlers.Box2DVars;
+import com.devour.all.main.Game;
+import com.devour.all.states.Play;
 
 /**
  * Created by Jacob on 6/28/2015.
@@ -57,6 +61,20 @@ public abstract class Entity {
         System.out.println(this.getSize()*.99f);
         setSize(this.getSize()*.99f);
         resize(body, this.getSize()*.99f);
+    }
+
+    public boolean isOnScreen(float xPos, float yPos){
+        float playerX = Play.getPlayer().getBody().getPosition().x;
+        float playerY = Play.getPlayer().getBody().getPosition().y;
+
+        float leftScreen = playerX * Box2DVars.PPM * 2 - (Gdx.graphics.getWidth() * Game.getMainCamera().zoom);
+        float rightScreen = playerX * Box2DVars.PPM * 2 + (Gdx.graphics.getWidth() * Game.getMainCamera().zoom);
+        float topScreen = playerY * Box2DVars.PPM * 2 + (Gdx.graphics.getHeight() * Game.getMainCamera().zoom);
+        float bottomScreen = playerY * Box2DVars.PPM * 2 - (Gdx.graphics.getHeight() * Game.getMainCamera().zoom);
+
+        boolean xDir = (leftScreen < xPos) && (xPos < rightScreen);
+        boolean yDir = (yPos > bottomScreen) && (yPos < topScreen);
+        return (xDir && yDir);
     }
 
     public abstract void barrierCollision();

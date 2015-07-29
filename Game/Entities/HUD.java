@@ -14,7 +14,7 @@ public class HUD extends ApplicationAdapter{
     Player player;
 
     public HUD(Player player){
-        font = new BitmapFont(Gdx.files.internal("android/assets/visitor.fnt"));
+        font = Game.res.getFont("mainFont");
         this.player = player;
     }
 

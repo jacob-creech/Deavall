@@ -32,9 +32,11 @@ public class Food extends Entity {
 
     @Override
     public void render() {
-        float xpos = body.getPosition().x * Box2DVars.PPM * 2 + 150;
-        float ypos = body.getPosition().y * Box2DVars.PPM * 1.5f + 112 + Play.getPlayer().getCoords().y * Box2DVars.PPM * 2.5f;
-        Game.getSpriteBatch().draw(pixmapTexture, xpos, ypos);
+        float xPos = body.getPosition().x * Box2DVars.PPM * 2 + 150;
+        float yPos = body.getPosition().y * Box2DVars.PPM * 1.5f + 112 + Play.getPlayer().getCoords().y * Box2DVars.PPM * 2.5f;
+        if(isOnScreen(body.getPosition().x * Box2DVars.PPM * 2, body.getPosition().y * Box2DVars.PPM * 2)) {
+            Game.getSpriteBatch().draw(pixmapTexture, xPos, yPos);
+        }
     }
 
     @Override
