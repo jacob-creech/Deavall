@@ -80,7 +80,7 @@ public class Play extends GameState {
     private Stage stage;
     private Skin skin;
 
-    boolean debug = true;
+    boolean debug = false;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -250,14 +250,14 @@ public class Play extends GameState {
         * difference between a player and an enemy. We are
         * setting this percentage to .5% for now.
          */
-        float percentageDiff = random(0,50) / 100f;
+        float percentageDiff = random(0,30) / 100f;
 
         int randomNum = rand.nextInt( (200-0) + 1);
         if(randomNum == 1) {
             percentageDiff = random(125,175) / 100f;
         }
 
-        float radius = player.getSize() + randomSign() * player.getSize() * percentageDiff;
+        float radius = .1f + randomSign() * .1f * percentageDiff;
         circle.setRadius(radius);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
@@ -306,7 +306,7 @@ public class Play extends GameState {
         circle.setRadius(5 / PPM);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
-        fixtureDef.isSensor = false;
+        fixtureDef.isSensor = true;
         fixtureDef.filter.categoryBits = BIT_FOOD;
         fixtureDef.filter.maskBits = BIT_ENEMY | BIT_PLAYER | BIT_ENEMY_FILTER;
         body.createFixture(fixtureDef).setUserData(BIT_FOOD);
@@ -335,6 +335,7 @@ public class Play extends GameState {
     public void restartGame(){
         world.destroyBody(player.getBody());
         createPlayer();
+        HUD.resetPlayer(player);
         resetSizes();
         mainCamera.zoom = 1;
         hudCamera.zoom = 1;
@@ -458,19 +459,27 @@ public class Play extends GameState {
                 }
                 sb.setProjectionMatrix(hudCamera.combined);
                 player.render();
+                sb.setProjectionMatrix(overlayCamera.combined);
                 hud.render();
 
+                sb.setProjectionMatrix(hudCamera.combined);
+                overlayCamera.position.set(
+                        player.getBody().getPosition().x,//+ WIDTH / 8 / PPM ,
+                        player.getBody().getPosition().y,
+                        0
+                );
                 mainCamera.position.set(
                         player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
                         player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
                         0
                 );
                 if (eventHandler.getMainCamZoom() > 0) {
-                    mainCamera.zoom += .002 * eventHandler.getMainCamZoom();
-                    hudCamera.zoom += .002 * eventHandler.getMainCamZoom();
-                    eventHandler.setMainCamZoom(0);
+                    eventHandler.setMainCamZoom(eventHandler.getMainCamZoom() - 1);
+                    mainCamera.zoom += .002;
+                    hudCamera.zoom += .002;
                 }
 
+                overlayCamera.update();
                 mainCamera.update();
                 hudCamera.update();
             } else {

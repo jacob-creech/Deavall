@@ -17,6 +17,7 @@ public abstract class GameState {
     protected SpriteBatch sb;
     protected OrthographicCamera mainCamera;
     protected OrthographicCamera hudCamera;
+    protected OrthographicCamera overlayCamera;
 
     protected GameState(GameStateManager gsm){
         this.gsm = gsm;
@@ -24,6 +25,7 @@ public abstract class GameState {
         sb = game.getSpriteBatch();
         mainCamera = game.getMainCamera();
         hudCamera = game.getHudCamera();
+        overlayCamera = game.getOverlayCamera();
     }
 
     public abstract void handleInput();

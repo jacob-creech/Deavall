@@ -11,11 +11,15 @@ import com.devour.all.main.Game;
 public class HUD extends ApplicationAdapter{
 
     BitmapFont font;
-    Player player;
+    private static Player player;
 
     public HUD(Player player){
         font = Game.res.getFont("mainFont");
         this.player = player;
+    }
+
+    public static void resetPlayer(Player newPlayer){
+        player = newPlayer;
     }
 
     public void render(){

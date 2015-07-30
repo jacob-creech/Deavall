@@ -16,6 +16,7 @@ public class Game extends ApplicationAdapter {
     private static SpriteBatch sb;
     private static OrthographicCamera mainCamera;
     private static OrthographicCamera hudCamera;
+    private static OrthographicCamera overlayCamera;
 
     public static final float STEP = 1/60f;
     public static PlayerInputProcessor input;
@@ -27,6 +28,7 @@ public class Game extends ApplicationAdapter {
     public static SpriteBatch getSpriteBatch() { return sb; }
     public static OrthographicCamera getMainCamera() { return mainCamera; }
     public static OrthographicCamera getHudCamera() { return hudCamera; }
+    public static OrthographicCamera getOverlayCamera() { return overlayCamera; }
 
     private GameStateManager gsm;
     public static ResourceManager res;
@@ -42,6 +44,8 @@ public class Game extends ApplicationAdapter {
         mainCamera.setToOrtho(false);
         hudCamera = new OrthographicCamera();
         hudCamera.setToOrtho(false);
+        overlayCamera = new OrthographicCamera();
+        overlayCamera.setToOrtho(false);
 
         WIDTH = Gdx.graphics.getWidth();
         HEIGHT = Gdx.graphics.getHeight();

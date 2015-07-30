@@ -80,8 +80,9 @@ public class EventHandler {
             player.resize(player.getBody(), player.getSize() + (enemy.getSize() * .3f));
             player.setSize(player.getSize() + (enemy.getSize() * .3f));
             addToRemove(enemy.getBody());
-            box2dZoom+= (enemy.getSize() * .3f / .1f);
-            mainCamZoom+= (enemy.getSize() * .3f / .1f);
+            int newZoom = (int)Math.ceil(enemy.getSize() / .001f);
+            box2dZoom+= (newZoom);
+            mainCamZoom+= (newZoom);
         }
     }
     public void handleEnemyCol(Fixture fixtureA, Fixture fixtureB) {
