@@ -455,19 +455,23 @@ public class Play extends GameState {
                     foods.get(i).render();
                 }
                 for (int i = 0; i < enemies.size(); i++) {
-                    enemies.get(i).render();
+                    if(enemies.get(i).getSize() < player.getSize()) {
+                        enemies.get(i).render();
+                    }
                 }
                 sb.setProjectionMatrix(hudCamera.combined);
                 player.render();
+
+                sb.setProjectionMatrix(mainCamera.combined);
+                for (int i = 0; i < enemies.size(); i++) {
+                    if(enemies.get(i).getSize() > player.getSize()) {
+                        enemies.get(i).render();
+                    }
+                }
                 sb.setProjectionMatrix(overlayCamera.combined);
                 hud.render();
 
                 sb.setProjectionMatrix(hudCamera.combined);
-                overlayCamera.position.set(
-                        player.getBody().getPosition().x,//+ WIDTH / 8 / PPM ,
-                        player.getBody().getPosition().y,
-                        0
-                );
                 mainCamera.position.set(
                         player.getBody().getPosition().x * PPM * 2 + WIDTH / 4,
                         player.getBody().getPosition().y * PPM * 4 + HEIGHT / 4,
@@ -479,9 +483,10 @@ public class Play extends GameState {
                     hudCamera.zoom += .002;
                 }
 
-                overlayCamera.update();
                 mainCamera.update();
                 hudCamera.update();
+                overlayCamera.update();
+
             } else {
                 loading.render();
             }

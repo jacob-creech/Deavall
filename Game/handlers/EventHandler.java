@@ -80,7 +80,7 @@ public class EventHandler {
             player.resize(player.getBody(), player.getSize() + (enemy.getSize() * .3f));
             player.setSize(player.getSize() + (enemy.getSize() * .3f));
             addToRemove(enemy.getBody());
-            int newZoom = (int)Math.ceil(enemy.getSize() / .001f);
+            int newZoom = (int)Math.ceil(enemy.getSize() / .002f);
             box2dZoom+= (newZoom);
             mainCamZoom+= (newZoom);
         }
