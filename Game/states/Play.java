@@ -57,6 +57,7 @@ public class Play extends GameState {
     private Box2DDebugRenderer b2dr;
     private static final float WIDTH = Gdx.graphics.getWidth();
     private static final float HEIGHT = Gdx.graphics.getHeight();
+    private static final float defaultHeight = 480;
 
     public static ArrayList<Enemy> enemies;
     private static ArrayList<Food> foods;
@@ -98,6 +99,11 @@ public class Play extends GameState {
         b2dr = new Box2DDebugRenderer();
         b2dcam = new OrthographicCamera();
         b2dcam.setToOrtho(false, (WIDTH/2) / PPM, (WIDTH/2) / PPM);
+
+        System.out.println(HEIGHT);
+
+        mainCamera.zoom = defaultHeight / HEIGHT;
+        hudCamera.zoom = defaultHeight / HEIGHT;
 
         // Initialize arrayLists
         enemies = new ArrayList<Enemy>();
@@ -370,6 +376,9 @@ public class Play extends GameState {
         if(doubleTap){
             // Do Split
             doubleTap = false;
+            float xPos = InputHandler.getXPos();
+            float yPos = InputHandler.getYPos();
+            player.split(xPos, yPos);
         }
     }
 

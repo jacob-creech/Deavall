@@ -53,6 +53,7 @@ public class PlayerInputProcessor implements GestureDetector.GestureListener, In
     @Override
     public boolean tap(float x, float y, int count, int button) {
         InputHandler.setTap(true);
+        InputHandler.setTouch(x, y);
         return false;
     }
 

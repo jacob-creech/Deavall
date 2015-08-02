@@ -19,4 +19,5 @@ public class InputHandler {
 
     public static boolean ifTouch(){ return touchDown; }
     public static void setTouchDown(boolean b) { touchDown = b; }
+
 }

@@ -62,6 +62,13 @@ public class Player extends Entity{
 
     }
 
+    public void split(float xPos, float yPos){
+
+        for(int i = 0; i < playerBodies.size(); i++){
+            playerBodies.remove(i);
+        }
+    }
+
     @Override
     public void update(float dt) {
         if(this.getScoreInt() > highscore){
