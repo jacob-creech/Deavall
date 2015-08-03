@@ -19,6 +19,13 @@ public class PlayerInputProcessor implements GestureDetector.GestureListener, In
     public GestureDetector returnGestureDetector() { return gd; }
 
     @Override
+    public boolean tap(float x, float y, int count, int button) {
+        InputHandler.setTap(true);
+        InputHandler.setTouch(x, y);
+        return false;
+    }
+
+    @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
         Body body = Play.getPlayer().getBody();
         xPos = (Gdx.input.getX() - Gdx.graphics.getWidth() / 2f);
@@ -50,12 +57,7 @@ public class PlayerInputProcessor implements GestureDetector.GestureListener, In
         return false;
     }
 
-    @Override
-    public boolean tap(float x, float y, int count, int button) {
-        InputHandler.setTap(true);
-        InputHandler.setTouch(x, y);
-        return false;
-    }
+
 
     @Override
     public boolean longPress(float x, float y) {

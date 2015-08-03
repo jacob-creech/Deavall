@@ -5,14 +5,12 @@ import com.badlogic.gdx.Gdx;
 import static com.badlogic.gdx.math.MathUtils.random;
 import static com.badlogic.gdx.math.MathUtils.randomSign;
 import static com.devour.all.handlers.Box2DVars.*;
-import static java.lang.Thread.sleep;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -26,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.devour.all.entities.Enemy;
-import com.devour.all.entities.Entity;
 import com.devour.all.entities.Food;
 import com.devour.all.entities.HUD;
 import com.devour.all.entities.Player;
@@ -36,14 +33,7 @@ import com.devour.all.handlers.EventHandler;
 import com.devour.all.handlers.GameStateManager;
 import com.devour.all.handlers.InputHandler;
 import com.devour.all.handlers.Loading;
-import com.devour.all.handlers.PlayerInputProcessor;
 import com.devour.all.main.Game;
-
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
-
-import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -367,6 +357,7 @@ public class Play extends GameState {
             retryButton.setChecked(false);
         }
         if(inputHandler.getTap()){
+            System.out.println("TAP");
             inputHandler.setTap(false);
             firstTap = true;
             if(doubleTapTimer < 30){
@@ -375,6 +366,7 @@ public class Play extends GameState {
         }
         if(doubleTap){
             // Do Split
+            System.out.println("DOUBLE TAP");
             doubleTap = false;
             float xPos = InputHandler.getXPos();
             float yPos = InputHandler.getYPos();
@@ -389,6 +381,7 @@ public class Play extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
+        hud.update(dt);
         if(firstTap){
             doubleTapTimer++;
             if(doubleTapTimer > 30){
