@@ -80,6 +80,7 @@ public class Play extends GameState {
         world = new World(new Vector2(0, 0), true);
         eventHandler = new EventHandler();
         world.setContactListener(new EntityContactListener(eventHandler));
+        inputHandler = new InputHandler();
         loading = new Loading();
         loadingDone = false;
         stage = new Stage();
@@ -368,9 +369,7 @@ public class Play extends GameState {
             // Do Split
             System.out.println("DOUBLE TAP");
             doubleTap = false;
-            float xPos = InputHandler.getXPos();
-            float yPos = InputHandler.getYPos();
-            player.split(xPos, yPos);
+            player.split();
         }
     }
 
